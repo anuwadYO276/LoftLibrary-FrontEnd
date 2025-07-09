@@ -20,7 +20,13 @@
 }
 
 body {
-  background: var(--background);
+  background: #252323;
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.login-page h1,
+.login-page h2 {
+  color: #4ecdc4;
+}
+
