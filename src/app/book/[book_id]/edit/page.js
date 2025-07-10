@@ -7,7 +7,16 @@ import Sidebar from "@/components/ui/Sidebar"
 import Header from "@/components/ui/Header"
 
 export default function BookDetailPage({ params }) {
-  const { id } = use(params)
+    const [bookId, setBookId] = useState(null);
+    useEffect(() => {
+      console.log("useEffect run");
+      async function fetchBookId() {
+        const resolved = await params;  // รอ Promise resolve
+        setBookId(resolved.book_id);
+      }
+      fetchBookId();
+    }, [params]);
+
   const [currentlyPlaying, setCurrentlyPlaying] = useState(false)
   const [isFollowing, setIsFollowing] = useState(false)
   const [isBookmarked, setIsBookmarked] = useState(false)
@@ -67,7 +76,7 @@ export default function BookDetailPage({ params }) {
               authorAvatar="https://images.icon-icons.com/2429/PNG/512/google_logo_icon_147282.png"
               isStatusWriterEnded={isStatusWriterEnded}
               isAuthor={isAuthor}
-              id={id}
+              id={bookId}
             />
           </div>
 
@@ -115,8 +124,7 @@ export default function BookDetailPage({ params }) {
 
               )}
             </div>
-
-            <EpisodesList episodes={episodes} onUnlock={handleUnlockEpisode} isAuthor={isAuthor} id={id} />
+            <EpisodesList episodes={episodes} onUnlock={handleUnlockEpisode} isAuthor={isAuthor} id={bookId} />
           </div>
         </div>
       </div>

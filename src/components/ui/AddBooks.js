@@ -4,6 +4,8 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import NoSSRSelect from "@/components/ui/NoSSRSelect"
 import { useRouter } from "next/navigation"
+import { createBook, updateBook } from "@/lib/api/book"
+import { useAuth } from "@/contexts/AuthContext"  // ดึง user มาจากที่นี่
 
 const options = [
   { value: "Horror", label: "Horror" },
@@ -21,7 +23,8 @@ const statusOptions = [
 ]
 
 export default function AddBooks({ isEdit = false, editId = null }) {
-  const [bookName, setBookName] = useState("")
+  const { user } = useAuth()
+  const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
   const [categories, setCategories] = useState([])
   const [coverFile, setCoverFile] = useState(null)
@@ -29,16 +32,16 @@ export default function AddBooks({ isEdit = false, editId = null }) {
   const [releaseDate, setReleaseDate] = useState("")
   const [status, setStatus] = useState("draft")
   const router = useRouter()
+  const authorId = user?.user?.id || null  // ดึง author_id จาก user context
 
   useEffect(() => {
     if (isEdit && editId) {
-      // ตัวอย่าง: โหลดข้อมูลจาก API
       fetch(`/api/books/${editId}`)
         .then((res) => res.json())
         .then((data) => {
           if (data.releaseDate) setReleaseDate(data.releaseDate)
           if (data.status) setStatus(data.status)
-          setBookName(data.name)
+          setTitle(data.title)
           setDescription(data.description)
           setCategories(data.categories.map((c) => ({ value: c, label: c })))
           if (data.coverUrl) setCoverPreview(data.coverUrl)
@@ -46,9 +49,17 @@ export default function AddBooks({ isEdit = false, editId = null }) {
     }
   }, [isEdit, editId])
 
+  // ล้าง URL preview เมื่อเปลี่ยนหรือ unmount
+  useEffect(() => {
+    return () => {
+      if (coverPreview) URL.revokeObjectURL(coverPreview)
+    }
+  }, [coverPreview])
+
   const handleFileChange = (e) => {
     const file = e.target.files?.[0]
     if (file && (file.type === "image/jpeg" || file.type === "image/png")) {
+      if (coverPreview) URL.revokeObjectURL(coverPreview) // ล้างของเก่า
       setCoverFile(file)
       setCoverPreview(URL.createObjectURL(file))
     } else {
@@ -64,6 +75,37 @@ export default function AddBooks({ isEdit = false, editId = null }) {
     setCoverPreview(null)
   }
 
+  const handleSubmit = async () => {
+    if (!user || !user.user?.id) {
+      alert("User not authenticated")
+      return
+    }
+   
+    const payload = {
+      title,
+      description,
+      releaseDate,
+      status,
+      categories: categories.map((c) => c.value),
+      coverFile,
+      authorId
+    }
+
+    try {
+      if (isEdit) {
+        const updated = await updateBook(editId, payload)
+        router.push(`/book/${updated.data.id}/edit`)  // เปลี่ยนจาก updated.id เป็น updated.data.id
+      } else {
+        const created = await createBook(payload)
+        router.push(`/book/${created.data.id}/edit`)  // เปลี่ยนจาก created.id เป็น created.data.id
+      }
+    } catch (err) {
+      console.error(err)
+      alert("Failed to save book.")
+    }
+
+  }
+
   return (
     <div className="p-6">
       <h1 className="text-3xl font-bold text-teal-300 mb-6">
@@ -71,61 +113,55 @@ export default function AddBooks({ isEdit = false, editId = null }) {
       </h1>
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-        {/* Upload Cover - col 4 */}
         <div className="md:col-span-4">
           <label className="block text-sm mb-1 text-teal-300">Upload Cover</label>
           <div
-  className="border-2 border-dashed  rounded-lg p-4 flex flex-col items-center justify-center cursor-pointer hover:border-teal-600 transition-colors"
-  onClick={() => document.getElementById("coverInput").click()}
->
-  <input
-    id="coverInput"
-    type="file"
-    accept=".jpg,.jpeg,.png"
-    onChange={handleFileChange}
-    className="hidden"
-  />
-  {!coverPreview ? (
-    <div className="text-teal-400 text-center select-none h-100">
-      <p className="mt-20 mb-1 text-lg font-semibold" >Click or Drag & Drop to upload</p>
-      <p className="text-sm">.jpg, .jpeg, .png only</p>
-    </div>
-  ) : (
-    <div className="flex flex-col items-center">
-      <img
-        src={coverPreview}
-        alt="Cover Preview"
-        className="w-100 h-90 object-cover rounded-lg shadow-md mb-3"
-      />
-
-       <button
-        className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors"
-        onClick={(e) => {
-          e.stopPropagation() // ป้องกัน event คลิกกระโดดไป input
-          handleRemoveFile()
-        }}
-      >
-        Remove Cover
-      </button>
-    </div>
-  )}
-</div>
-
+            className="border-2 border-dashed rounded-lg p-4 flex flex-col items-center justify-center cursor-pointer hover:border-teal-600 transition-colors"
+            onClick={() => document.getElementById("coverInput").click()}
+          >
+            <input
+              id="coverInput"
+              type="file"
+              accept=".jpg,.jpeg,.png"
+              onChange={handleFileChange}
+              className="hidden"
+            />
+            {!coverPreview ? (
+              <div className="text-teal-400 text-center select-none h-100">
+                <p className="mt-20 mb-1 text-lg font-semibold">Click or Drag & Drop to upload</p>
+                <p className="text-sm">.jpg, .jpeg, .png only</p>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center">
+                <img
+                  src={coverPreview}
+                  alt="Cover Preview"
+                  className="w-100 h-90 object-cover rounded-lg shadow-md mb-3"
+                />
+                <button
+                  className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleRemoveFile()
+                  }}
+                >
+                  Remove Cover
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Inputs - col 8 */}
         <div className="md:col-span-8 space-y-4">
-          {/* Book Title */}
           <div>
             <label className="block text-sm mb-1 text-teal-300">Book Title</label>
             <input
               className="w-full border p-2 rounded"
-              value={bookName}
-              onChange={(e) => setBookName(e.target.value)}
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
             />
           </div>
 
-          {/* Description */}
           <div>
             <label className="block text-sm mb-1 text-teal-300">Description</label>
             <textarea
@@ -136,7 +172,6 @@ export default function AddBooks({ isEdit = false, editId = null }) {
             />
           </div>
 
-          {/* Categories */}
           <div>
             <label className="block text-sm mb-1 text-teal-300">Categories</label>
             <NoSSRSelect
@@ -150,7 +185,6 @@ export default function AddBooks({ isEdit = false, editId = null }) {
             />
           </div>
 
-          {/* Release Date */}
           <div>
             <label className="block text-sm mb-1 text-teal-300">Release Date</label>
             <input
@@ -161,7 +195,6 @@ export default function AddBooks({ isEdit = false, editId = null }) {
             />
           </div>
 
-          {/* Status */}
           <div>
             <label className="block text-sm mb-1 text-teal-300">Status</label>
             <NoSSRSelect
@@ -172,22 +205,13 @@ export default function AddBooks({ isEdit = false, editId = null }) {
               classNamePrefix="select"
             />
           </div>
-
-
         </div>
       </div>
 
-      {/* Save / Update Button */}
       <div className="mt-6">
         <Button
           className="bg-teal-500 text-white px-6 py-2 rounded-md hover:bg-teal-600"
-          onClick={() => {
-            if (isEdit) {
-              router.push(`/book/${editId}`) // 👉 ไปหน้า /book/a1 หรืออะไรก็ได้
-            } else {
-              router.push("/book/1") // 👉 จำลองว่าเพิ่มหนังสือใหม่ได้ ID = 1
-            }
-          }}
+          onClick={handleSubmit}
         >
           {isEdit ? "Update Book" : "Save Add Book"}
         </Button>

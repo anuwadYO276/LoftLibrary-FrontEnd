@@ -71,7 +71,7 @@ export default function UserProfileMenu() {
               Coin: <span className="text-yellow-500">100 C</span>
             </div>
 
-            {user.role !== "reader" && (
+            {user.user.role !== "reader" && (
               <TextLink href="/my-writing" className="text-left text-gray-700 hover:text-mint-light font-medium">
                 My Writing
               </TextLink>

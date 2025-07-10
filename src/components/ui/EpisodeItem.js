@@ -1,22 +1,17 @@
 import { Badge } from "@/components/ui/badge"
 import { Lock, Unlock,Edit  } from "lucide-react"
+import Link from "next/link"
 
-export default function EpisodeItem({ episode, onUnlock, isAuthor }) {
+export default function EpisodeItem({ episode, onUnlock, isAuthor, id }) {
   return (
     <>
     <div className="flex items-center justify-between p-4 rounded-lg hover:bg-gray-800 transition-colors cursor-pointer">
       <div className="flex items-center gap-4">
     
-        {isAuthor ? (
-          <></>
-        ) : (
-          <>
-
-          <a href={`/add-books/${episode.bookId}/episode/${episode.id}`} className="text-teal-400 hover:text-mint-light transition-colors">
+       {isAuthor && (
+          <Link href={`/add-books/${id}/episode/${episode.id}`} className="text-teal-400 hover:text-mint-light transition-colors">
             <Edit />
-          </a>
-          
-          </>
+          </Link>
         )}
         <span className="text-xl font-bold  drop-shadow-md">#{episode.id}</span>
         <h3 className="text-lg font-semibold  drop-shadow-md">{episode.title}</h3>
