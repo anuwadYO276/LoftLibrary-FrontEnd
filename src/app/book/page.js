@@ -64,7 +64,7 @@ export default function LibraryPage() {
 
           <section className="mb-8">
             <h2 className="text-white text-2xl font-bold mb-6">
-              Recommend: <span className="text-mint-light">Romance</span>
+              Recommend: <span className="text-mint-light text-teal-300">Romance</span>
             </h2>
             <BookGrid books={romanceBooks} />
           </section>

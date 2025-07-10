@@ -39,7 +39,7 @@ export default function Sidebar() {
           {user ? (
             <>
              {user.user.role != "reader" && (
-              <TextLink href="/" className="w-full flex items-center gap-3 text-white hover:bg-gray-700 p-2 rounded">
+              <TextLink href="/add-books" className="w-full flex items-center gap-3 text-white hover:bg-gray-700 p-2 rounded">
                 <Plus  className="w-4 h-4" />
                 Add books
               </TextLink>
