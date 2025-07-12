@@ -1,50 +1,81 @@
 "use client"
 
-import { use, useState,useEffect } from "react"
+import { useState, useEffect } from "react"
 import BookInfo from "@/components/ui/BookInfo"
 import EpisodesList from "@/components/ui/EpisodesList"
 import Sidebar from "@/components/ui/Sidebar"
 import Header from "@/components/ui/Header"
-
-export default function BookDetailPage({ params }) {
-    const [bookId, setBookId] = useState(null);
-    useEffect(() => {
-      console.log("useEffect run");
-      async function fetchBookId() {
-        const resolved = await params;  // รอ Promise resolve
-        setBookId(resolved.book_id);
-      }
-      fetchBookId();
-    }, [params]);
-
+import { getBookId,updateIsComplete} from "@/lib/api/book"
+import { useParams } from "next/navigation"
+import { useAuth } from "@/contexts/AuthContext"
+export default function BookDetailPage() {
+  const params = useParams()
+  const id = params.book_id
+  const [book, setBook] = useState(null)
   const [currentlyPlaying, setCurrentlyPlaying] = useState(false)
   const [isFollowing, setIsFollowing] = useState(false)
   const [isBookmarked, setIsBookmarked] = useState(false)
   const [rating, setRating] = useState(0)
-  const [isAuthor, setIsAuthor] = useState(false)
-  const [isStatusWriterEnded, setIsStatusWriterEnded] = useState(true)
+  const [isAuthor, setIsAuthor] = useState(true)
+  const [episodes, setEpisodes] = useState([])
+  const [isStatusWriterEnded, setIsStatusWriterEnded] = useState(false)
+  const { user, logout } = useAuth()
+  useEffect(() => {
+    if (!id) return
 
+    const fetchBook = async () => {
+      try {
+        const dataArr = await getBookId(id)
+        const data = dataArr.product || {}
+        
+        if (user && user.user && user.user.id && data.author_id) {
+          if (user.user.id === data.author_id) {
+            setIsAuthor(true)
+          }
+        }
+        setIsStatusWriterEnded(data.is_complete || false)
+        setBook(data)
+        setEpisodes(dataArr.episodes || []) // ใช้ [] ถ้าไม่มี
 
-  const [episodes, setEpisodes] = useState([
-    { id: 1, title: "The Whispering Flame", date: "1/10/2020", time: "12:54 PM", price: null, isLocked: false },
-    { id: 2, title: "Moths to the Maw", date: "1/10/2020", time: "02:18 PM", price: 30, isLocked: true },
-    { id: 3, title: "Ashes of the Innocent", date: "3/10/2020", time: "01:27 AM", price: 25, isLocked: true },
-    { id: 4, title: "The Candle Burns Black", date: "3/10/2020", time: "01:41 AM", price: 25, isLocked: true },
-    { id: 5, title: "Offerings in the Dark", date: "3/10/2020", time: "03:21 PM", price: 35, isLocked: true },
-  ])
+        // แก้ให้เทียบ author id เป็น number
+        if (Number(data.author_id) === 14) {
+          setIsAuthor(true)
+        }
+      } catch (err) {
+        console.error("ไม่สามารถโหลดข้อมูลหนังสือได้:", err)
+      }
+    }
 
-  const handleUnlockEpisode = (id) => {
+    fetchBook()
+  }, [id, user])
+
+  const handleUnlockEpisode = (eid) => {
     setEpisodes((prev) =>
-      prev.map((ep) => (ep.id === id ? { ...ep, isLocked: false, price: null } : ep))
+      prev.map((ep) => (ep.id === eid ? { ...ep, isLocked: false, price: null } : ep))
     )
   }
 
   const unlockAllEpisodes = () => {
-    setEpisodes((prev) =>
-      prev.map((ep) => ({ ...ep, isLocked: false, price: null }))
-    )
+    setEpisodes((prev) => prev.map((ep) => ({ ...ep, isLocked: false, price: null })))
   }
-  
+
+
+  const handleSetIsStatusWriterEnded = async (value) => {
+    setIsStatusWriterEnded(value)
+
+    if (user?.user?.id && id) {
+      try {
+        await updateIsComplete(id, value)
+      } catch (err) {
+        console.error("Failed to update book status:", err)
+      }
+    }
+  }
+
+
+  if (!book) {
+    return <div className="text-white p-8">กำลังโหลดข้อมูลหนังสือ...</div>
+  }
 
   return (
     <div className="min-h-screen bg-custom-bg flex">
@@ -53,14 +84,19 @@ export default function BookDetailPage({ params }) {
         <Header />
 
         <div className="min-h-screen bg-custom-bg text-white p-8">
-          {/* Book Section */}
           <div className="flex gap-8 mb-8">
             <div className="flex-shrink-0">
-              <img
-                src="https://m.media-amazon.com/images/I/511P7eN21YL._AC_UY399_FMwebp_.jpg"
-                alt="All The Devils"
-                className="w-80 h-96 object-cover rounded-lg shadow-2xl"
-              />
+              {book.cover_url ? (
+                <img
+                  src={`${process.env.NEXT_PUBLIC_API_URL}${book.cover_url}`}
+                  alt={book.title}
+                  className="w-80 h-96 object-cover rounded-lg shadow-2xl"
+                />
+              ) : (
+                <div className="w-80 h-96 bg-gray-800 rounded-lg shadow-2xl flex items-center justify-center">
+                  <span className="text-gray-500">No Cover Image</span>
+                </div>
+              )}
             </div>
 
             <BookInfo
@@ -70,61 +106,56 @@ export default function BookDetailPage({ params }) {
               setIsBookmarked={setIsBookmarked}
               isFollowing={isFollowing}
               setIsFollowing={setIsFollowing}
-              title="All The Devils"
-              author="Catelyn"
-              description="A gripping tale of betrayal, ambition, and the dark corners of the human soul. Follow the journey of a young woman as she navigates a world filled with deception and moral ambiguity."
-              authorAvatar="https://images.icon-icons.com/2429/PNG/512/google_logo_icon_147282.png"
+              title={book.title}
+              author={book.pen_name || book.username || "Unknown"}
+              description={book.description}
+              authorAvatar={
+                book.avatar_url
+                  ? `${process.env.NEXT_PUBLIC_API_URL}${book.avatar_url}`
+                  : "https://images.icon-icons.com/2429/PNG/512/google_logo_icon_147282.png"
+              }
               isStatusWriterEnded={isStatusWriterEnded}
               isAuthor={isAuthor}
-              id={bookId}
+              id={id}
+              category={book.category || "Uncategorized"}
             />
           </div>
 
-          {/* Episodes Section */}
           <div className="border-t border-gray-700 pt-8">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold">All episodes ({episodes.length})</h2>
 
               {isAuthor ? (
-                <div
-                  role="button"
-                  tabIndex={0}
-                  className="inline-flex items-center bg-mint-light hover:bg-mint-dark text-white font-semibold px-6 py-2 rounded cursor-pointer select-none"
-                  onClick={unlockAllEpisodes}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault()
-                      unlockAllEpisodes()
-                    }
-                  }}
-                >
-                  Unlock all episodes
-                  <span className="ml-2 bg-gray-800 text-mint-light px-2 py-1 rounded text-sm">125 C</span>
-                </div>
-              ) : (
                 <div className="flex items-center gap-4">
                   <h2 className="text-2xl font-bold">Status: End</h2>
-
                   <label htmlFor="unlockToggle" className="relative cursor-pointer">
                     <input
                       type="checkbox"
                       id="unlockToggle"
                       className="sr-only peer"
-                      onChange={(e) => {
-                        const unlock = e.target.checked
-                        setIsStatusWriterEnded(unlock)
-                      }}
+                      checked={isStatusWriterEnded}
+                      onChange={(e) => handleSetIsStatusWriterEnded(e.target.checked)}
                     />
-                    {/* Track */}
                     <div className="w-11 h-6 bg-gray-600 rounded-full peer-checked:bg-teal-500 transition-colors"></div>
-                    {/* Thumb */}
                     <div className="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full transition-transform peer-checked:translate-x-5"></div>
                   </label>
                 </div>
-
+              ) : (
+                
+                <div
+                  role="button"
+                  tabIndex={0}
+                  className="inline-flex items-center bg-mint-light hover:bg-mint-dark text-white font-semibold px-6 py-2 rounded cursor-pointer select-none"
+                  onClick={unlockAllEpisodes}
+                >
+                  Unlock all episodes
+                  <span className="ml-2 bg-gray-800 text-mint-light px-2 py-1 rounded text-sm">125 C</span>
+                </div>
+                
               )}
             </div>
-            <EpisodesList episodes={episodes} onUnlock={handleUnlockEpisode} isAuthor={isAuthor} id={bookId} />
+
+            <EpisodesList episodes={episodes} onUnlock={handleUnlockEpisode} isAuthor={isAuthor} />
           </div>
         </div>
       </div>

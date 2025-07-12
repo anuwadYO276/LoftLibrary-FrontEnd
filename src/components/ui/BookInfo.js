@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Bookmark, Heart } from "lucide-react"
 
-export default function BookInfo({ rating, setRating, isBookmarked, setIsBookmarked, isFollowing, setIsFollowing, title, author, description, authorAvatar, isStatusWriterEnded,isAuthor,id }) {
+export default function BookInfo({ rating, setRating, isBookmarked, setIsBookmarked, isFollowing, setIsFollowing, title, author, description, authorAvatar, isStatusWriterEnded,isAuthor,id ,category}) {
   const renderStars = (currentRating) => {
     return Array.from({ length: 5 }, (_, i) => {
       const starIndex = i + 1
@@ -40,6 +40,19 @@ export default function BookInfo({ rating, setRating, isBookmarked, setIsBookmar
         </h1>
 
       {isAuthor ? (
+        
+        // ถ้าไม่ใช่เจ้าของ ให้แสดงไอคอนพร้อมลิงก์ไปหน้าแก้ไขหนังสือ
+        <a
+          href={`/add-books/${id}`} // แก้ id เป็นตัวแปรจริงจาก props/state
+          className="cursor-pointer p-2 rounded-full hover:bg-gray-700 transition-colors flex items-center justify-center"
+          aria-label="Edit book"
+        >
+         <button className="w-6 h-6 text-teal-400 hover:text-mint-light transition-colors">
+            Edit
+         </button>
+        </a>
+      ) : (
+        
         <span
           onClick={() => setIsBookmarked(!isBookmarked)}
           className="cursor-pointer p-2 rounded-full hover:bg-gray-700 transition-colors flex items-center justify-center"
@@ -55,17 +68,6 @@ export default function BookInfo({ rating, setRating, isBookmarked, setIsBookmar
             fill={isBookmarked ? "currentColor" : "none"}
           />
         </span>
-      ) : (
-        // ถ้าไม่ใช่เจ้าของ ให้แสดงไอคอนพร้อมลิงก์ไปหน้าแก้ไขหนังสือ
-        <a
-          href={`/add-books/${id}`} // แก้ id เป็นตัวแปรจริงจาก props/state
-          className="cursor-pointer p-2 rounded-full hover:bg-gray-700 transition-colors flex items-center justify-center"
-          aria-label="Edit book"
-        >
-         <button className="w-6 h-6 text-teal-400 hover:text-mint-light transition-colors">
-            Edit
-         </button>
-        </a>
       )}
 
         </div>
@@ -102,18 +104,25 @@ export default function BookInfo({ rating, setRating, isBookmarked, setIsBookmar
 
       <div className="flex items-center gap-3">
         <Heart className="w-5 h-5 text-mint-light" />
-        <div className="flex gap-2">
-          <Badge variant="outline" className="border-gray-600 text-gray-300 hover:border-mint-light">
-            Horror
-          </Badge>
-          <Badge variant="outline" className="border-gray-600 text-gray-300 hover:border-mint-light">
-            Mystery
-          </Badge>
-          <Badge variant="outline" className="border-gray-600 text-gray-300 hover:border-mint-light">
-            DarkRomance
-          </Badge>
-        </div>
+         <div className="flex gap-2">
+        {category ? (
+          category.split(",").map((cat, index) => (
+            <Badge
+              key={index}
+              variant="outline"
+              className="border-gray-600 text-gray-300 hover:border-mint-light cursor-default"
+            >
+              {cat.trim()}
+            </Badge>
+          ))
+        ) : (
+          <span className="text-gray-500 italic">No categories</span>
+        )}
       </div>
+      </div>
+
+     
+
     </div>
   )
 }

@@ -36,18 +36,23 @@ export default function Sidebar() {
             <Bookmark className="w-4 h-4" />
             Bookmark
           </TextLink>
-          {user ? (
+
+          {user?.user ? (
             <>
-             {user.user.role != "reader" && (
-              <TextLink href="/add-books" className="w-full flex items-center gap-3 text-white hover:bg-gray-700 p-2 rounded">
-                <Plus  className="w-4 h-4" />
-                Add books
-              </TextLink>
-            )}
-        </>
-          ) : (
-            <></>
-          )}
+              {user.user.role !== "author" ? (
+                <TextLink href="/add-books" className="w-full flex items-center gap-3 text-white hover:bg-gray-700 p-2 rounded">
+                  <Plus className="w-4 h-4" />
+                  Add Books
+                </TextLink>
+              ) : (
+                <TextLink href="/add-role" className="w-full flex items-center gap-3 text-white hover:bg-gray-700 p-2 rounded">
+                  <Bookmark className="w-4 h-4" />
+                  Register as Author
+                </TextLink>
+              )}
+            </>
+          ) : null}
+
         </nav>
       </div>
 

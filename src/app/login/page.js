@@ -47,28 +47,6 @@ export default function LoginPage() {
             <h1 className="text-4xl font-bold text-mint-light mb-8">Log In</h1>
           </div>
 
-          {/* Social Login Buttons */}
-          <div className="flex justify-center space-x-4 mb-6">
-            <button className="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center transition-transform hover:scale-105 group">
-              <img
-                src="https://images.icon-icons.com/2429/PNG/512/google_logo_icon_147282.png"
-                alt="Google Logo"
-                className="scale-100"
-              />
-            </button>
-
-            <button className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center hover:scale-105 transition-transform">
-              <img
-                src="https://upload.wikimedia.org/wikipedia/commons/0/05/Facebook_Logo_%282019%29.png"
-                alt="Facebook Logo"
-              />
-            </button>
-          </div>
-
-          {/* Divider */}
-          <div className="text-center text-gray-400 mb-6">
-            <span>or</span>
-          </div>
 
           {/* Login Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -96,16 +74,16 @@ export default function LoginPage() {
               <div className="text-red-500 text-center font-semibold">{error}</div>
             )}
 
-            <div className="text-center">
+            {/* <div className="text-center">
               <TextLink
                 href="/forgot-password"
                 className="text-mint-dark hover:text-mint-light transition-colors text-sm"
               >
                 Forgot your password?
               </TextLink>
-            </div>
+            </div> */}
 
-            <Button className="w-full h-12" disabled={loading}>
+            <Button className="w-full h-12 mt-4" disabled={loading}>
               {loading ? "Logging in..." : "Log In"}
             </Button>
           </form>

@@ -8,8 +8,8 @@ import AddEpisodes from "@/components/ui/AddEpisodes"
 
 export default function AddEpisodePage() {
   const [currentlyPlaying, setCurrentlyPlaying] = useState(false)
-  const params = useParams()
   const router = useRouter()
+  const params = useParams()
   const bookId = params?.bookId
 
   if (!bookId) {
