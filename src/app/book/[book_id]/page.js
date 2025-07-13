@@ -7,7 +7,7 @@ import Sidebar from "@/components/ui/Sidebar"
 import Header from "@/components/ui/Header"
 import { getBookId,updateIsComplete} from "@/lib/api/book"
 import { getEpisodeProduct } from "@/lib/api/episode"
-import { useParams } from "next/navigation"
+import { useParams,useRouter  } from "next/navigation"
 import { useAuth } from "@/contexts/AuthContext"
 export default function BookDetailPage() {
   const params = useParams()
@@ -21,9 +21,16 @@ export default function BookDetailPage() {
   const [episodes, setEpisodes] = useState([])
   const [isStatusWriterEnded, setIsStatusWriterEnded] = useState(false)
   const { user, logout } = useAuth()
+  const router = useRouter()
+
   
+  console.log("User:", user)
 
   useEffect(() => {
+    if (!user) {
+      router.push("/login") // ถ้าไม่ login ให้ redirect
+      return
+    }
     if (!id) return
 
     const fetchBook = async () => {
