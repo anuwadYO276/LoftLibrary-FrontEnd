@@ -16,10 +16,10 @@ export default function Sidebar() {
   return (
     <div className="w-64 bg-custom-bg border-r border-white flex flex-col">
       <div className="p-6 border-b border-gray-700">
-        <h1 className="text-white text-2xl font-bold flex items-center gap-2">
-          Loft <Book className="w-6 h-6 text-teal-300" />
+        <h1 className="text-white text-4xl font-bold flex items-center gap-2">
+          Loft <Book className="w-10 h-10 text-teal-300" />
         </h1>
-        <h2 className="text-white text-2xl font-bold">Library</h2>
+        <h2 className="text-white text-4xl font-bold">Library</h2>
       </div>
 
       <div className="flex-1 p-4">
@@ -39,14 +39,14 @@ export default function Sidebar() {
 
           {user?.user ? (
             <>
-              {user.user.role !== "author" ? (
+              {user.user.role == "author" ? (
                 <TextLink href="/add-books" className="w-full flex items-center gap-3 text-white hover:bg-gray-700 p-2 rounded">
                   <Plus className="w-4 h-4" />
                   Add Books
                 </TextLink>
               ) : (
                 <TextLink href="/add-role" className="w-full flex items-center gap-3 text-white hover:bg-gray-700 p-2 rounded">
-                  <Bookmark className="w-4 h-4" />
+                  <Plus className="w-4 h-4" />
                   Register as Author
                 </TextLink>
               )}

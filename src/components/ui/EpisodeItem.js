@@ -38,7 +38,7 @@ export default function EpisodeItem({ episode, onUnlock, isAuthor, id }) {
       </div>
 
       <div className="flex items-center gap-4">
-        {isAuthor && (
+        {/* {isAuthor && (
           <>
             {episode.price && (
               <Badge className="bg-teal-300 text-black">
@@ -54,7 +54,23 @@ export default function EpisodeItem({ episode, onUnlock, isAuthor, id }) {
               />
             )}
           </>
-        )}
+        )} */}
+
+         <>
+            {episode.price && (
+              <Badge className="bg-teal-300 text-black">
+                {episode.price} C
+              </Badge>
+            )}
+
+            {!episode.isLocked && (
+              <Lock
+                className="w-6 h-6 text-teal-600 cursor-pointer hover:text-mint-dark transition-colors"
+                title="Unlock episode"
+                onClick={() => onUnlock(episode.id)}
+              />
+            )}
+          </>
 
         <div className="text-right text-gray-400">
           <div className="text-sm">{dateStr}</div>

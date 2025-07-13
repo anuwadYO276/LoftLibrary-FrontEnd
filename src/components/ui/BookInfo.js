@@ -40,8 +40,6 @@ export default function BookInfo({ rating, setRating, isBookmarked, setIsBookmar
         </h1>
 
       {isAuthor ? (
-        
-        // ถ้าไม่ใช่เจ้าของ ให้แสดงไอคอนพร้อมลิงก์ไปหน้าแก้ไขหนังสือ
         <a
           href={`/add-books/${id}`} // แก้ id เป็นตัวแปรจริงจาก props/state
           className="cursor-pointer p-2 rounded-full hover:bg-gray-700 transition-colors flex items-center justify-center"

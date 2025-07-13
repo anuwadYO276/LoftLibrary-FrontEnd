@@ -115,18 +115,41 @@ export async function updateIsComplete(id, isComplete) {
 }
 
 // 📚 Get all books
-export async function getBooks() {
-  const res = await fetch(`${BASE_URL}/product`, {
+// export async function getBooks() {
+//   const res = await fetch(`${BASE_URL}/product`, {
+//     headers: {
+//       Authorization: getBasicAuthHeader(),
+//     },
+//   })
+
+//   if (!res.ok) {
+//     const err = await res.json()
+//     throw new Error(err.message || "Failed to fetch books")
+//   }
+
+//   const json = await res.json()
+//   return json.data
+// }
+
+
+export async function getBooks({ category, page = 1, limit = 10, search = "" } = {}) {
+  const params = new URLSearchParams()
+  if (category) params.append("category", category)
+  if (page) params.append("page", page)
+  if (limit) params.append("limit", limit)
+  if (search) params.append("search", search)
+
+  const res = await fetch(`${BASE_URL}/product/?${params.toString()}`, {
     headers: {
       Authorization: getBasicAuthHeader(),
     },
   })
 
-  if (!res.ok) {
-    const err = await res.json()
-    throw new Error(err.message || "Failed to fetch books")
-  }
+  if (!res.ok) throw new Error("Failed to fetch books")
 
   const json = await res.json()
-  return json.data
+  return {
+    data: json.data || [],
+    pagination: json.pagination || {}
+  }
 }

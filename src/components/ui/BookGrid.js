@@ -1,16 +1,8 @@
-"use client"
-
 import React from "react"
 import Link from "next/link"
+import RatingStars from "./RatingStars"
 
 export default function BookGrid({ books }) {
-  console.log("Rendering BookGrid with books:", books)
-  const renderStars = (rating = 0) => {
-    return Array.from({ length: 5 }, (_, i) => (
-      <span key={i} className={`text-sm ${i < rating ? "text-mint-light" : "text-gray-600"}`}>★</span>
-    ))
-  }
-
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4 mb-8">
       {books.map((book, index) => {
@@ -29,8 +21,10 @@ export default function BookGrid({ books }) {
                 />
               </div>
             </Link>
-            <h3 className="text-white text-sm text-center mb-1 line-clamp-2">{book.title}</h3>
-            <div className="flex">{renderStars(book.rating)}</div>
+            <h3 className="text-white text-sm text-center mb-1 line-clamp-2">
+              {book.title}
+            </h3>
+            <RatingStars rating={book.score || 0} />
           </div>
         )
       })}

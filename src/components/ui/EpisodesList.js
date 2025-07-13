@@ -6,7 +6,7 @@ export default function EpisodesList({ episodes, onUnlock, isAuthor,id }) {
    <>
     <div className="space-y-4">
       {episodes.map((ep) => (
-        <EpisodeItem key={ep.id} episode={ep} onUnlock={onUnlock} isAuthor={isAuthor}  id={id} />
+        <EpisodeItem key={ep.id} episode={ep} onUnlock={onUnlock} isAuthor={isAuthor} id={id} />
       ))}
     </div>
 

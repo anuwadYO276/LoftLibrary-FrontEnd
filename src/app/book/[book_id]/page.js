@@ -17,10 +17,12 @@ export default function BookDetailPage() {
   const [isFollowing, setIsFollowing] = useState(false)
   const [isBookmarked, setIsBookmarked] = useState(false)
   const [rating, setRating] = useState(0)
-  const [isAuthor, setIsAuthor] = useState(true)
+  const [isAuthor, setIsAuthor] = useState(false)
   const [episodes, setEpisodes] = useState([])
   const [isStatusWriterEnded, setIsStatusWriterEnded] = useState(false)
   const { user, logout } = useAuth()
+  
+
   useEffect(() => {
     if (!id) return
 
@@ -28,19 +30,20 @@ export default function BookDetailPage() {
       try {
         const dataArr = await getBookId(id)
         const data = dataArr.product || {}
+        
         if (user && user.user && user.user.id && data.author_id) {
           if (user.user.id === data.author_id) {
-            setIsAuthor(true)
+            if(data.author_id == user.user.id){
+              console.log("User is the author of this book")
+              setIsAuthor(true)
+            }
           }
         }
         setIsStatusWriterEnded(data.is_complete || false)
         setBook(data)
         setEpisodes(dataArr.episodes || []) // ใช้ [] ถ้าไม่มี
 
-        // แก้ให้เทียบ author id เป็น number
-        if (Number(data.author_id) === 14) {
-          setIsAuthor(true)
-        }
+      
       } catch (err) {
         console.error("ไม่สามารถโหลดข้อมูลหนังสือได้:", err)
       }
@@ -74,7 +77,7 @@ export default function BookDetailPage() {
 
 
   if (!book) {
-    return <div className="text-white p-8">กำลังโหลดข้อมูลหนังสือ...</div>
+    return <div className="text-white p-8">Loading books...</div>
   }
 
   return (

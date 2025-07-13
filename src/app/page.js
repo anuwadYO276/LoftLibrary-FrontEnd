@@ -1,69 +1,97 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import React, { useState, useEffect } from "react"
 import Sidebar from "@/components/ui/Sidebar"
 import Header from "@/components/ui/Header"
-import BookGrid from "@/components/ui/BookGrid"
+import GenreFilter from "@/components/ui/GenreFilter"
+import GenreSection from "@/components/ui/GenreSection"
 import { getBooks } from "@/lib/api/book"
 import { genreOptions } from "@/constants/selectOptions"
 
 export default function LibraryPage() {
   const [currentlyPlaying, setCurrentlyPlaying] = useState(false)
-  const [books, setBooks] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [booksByGenre, setBooksByGenre] = useState({})
+  const [pagesByGenre, setPagesByGenre] = useState({})
+  const [loadingByGenre, setLoadingByGenre] = useState({})
+  const [selectedGenres, setSelectedGenres] = useState([])
+  const [searchTerm, setSearchTerm] = useState("")
 
-  useEffect(() => {
-    const fetchBooks = async () => {
-      try {
-        const allBooks = await getBooks()
-        setBooks(allBooks || [])
-      } catch (err) {
-        console.error("Failed to fetch books:", err)
-      } finally {
-        setLoading(false)
-      }
+  async function fetchBooksForGenre(genre, page = 1) {
+    setLoadingByGenre((prev) => ({ ...prev, [genre]: true }))
+
+    try {
+      const response = await getBooks({ category: genre, limit: 20, page, search: searchTerm })
+      setBooksByGenre((prev) => ({ ...prev, [genre]: response.data }))
+      setPagesByGenre((prev) => ({ ...prev, [genre]: page }))
+    } catch (error) {
+      console.error(`Failed to fetch books for genre ${genre} page ${page}`, error)
+    } finally {
+      setLoadingByGenre((prev) => ({ ...prev, [genre]: false }))
     }
-
-    fetchBooks()
-  }, [])
-
-  // ฟังก์ชันกรองหนังสือตาม category (genre)
-  const filterBooksByCategory = (category) => {
-    return books.filter(book => {
-      if (!book.category) return false
-      // แยก category string เป็น array แล้วตรวจสอบว่ามี category นี้ไหม
-      const categories = book.category.split(",").map(c => c.trim())
-      return categories.includes(category)
-    })
   }
 
-  if (loading) return <div className="text-white p-6">Loading...</div>
+  // โหลดข้อมูลตอนแรก หรือเวลาค้นหา หรือเลือกประเภทเปลี่ยน
+  useEffect(() => {
+    async function fetchInitialBooks() {
+      for (const genre of genreOptions) {
+        await fetchBooksForGenre(genre.value, 1)
+      }
+    }
+    fetchInitialBooks()
+  }, [searchTerm, selectedGenres])
+
+  function toggleGenre(genre) {
+    setSelectedGenres((prev) =>
+      prev.includes(genre) ? prev.filter((g) => g !== genre) : [...prev, genre]
+    )
+  }
+
+  function shouldDisplayCategory(category) {
+    return selectedGenres.length === 0 || selectedGenres.includes(category)
+  }
+
+  if (Object.values(loadingByGenre).some(Boolean)) {
+    return <div className="text-white p-6">Loading...</div>
+  }
 
   return (
     <div className="min-h-screen bg-custom-bg flex">
-      <Sidebar
-        currentlyPlaying={currentlyPlaying}
-        setCurrentlyPlaying={setCurrentlyPlaying}
-      />
+      <Sidebar currentlyPlaying={currentlyPlaying} setCurrentlyPlaying={setCurrentlyPlaying} />
 
       <div className="flex-1 flex flex-col">
-        <Header />
+        <Header onSearch={setSearchTerm} />
+
         <main className="flex-1 p-6 overflow-y-auto">
+          
+          <GenreFilter
+            genreOptions={genreOptions}
+            selectedGenres={selectedGenres}
+            toggleGenre={toggleGenre}
+            clearSelection={() => setSelectedGenres([])}
+          />
+
+          {/* แสดง text ที่ได้ค้นหา */}
+          {searchTerm && (
+            <div className="text-white mb-4">
+              ผลการค้นหา: <strong>{searchTerm}</strong>
+            </div>
+          )}
 
           {genreOptions.map(({ value, label }) => {
-            const booksInCategory = filterBooksByCategory(value)
-            if (booksInCategory.length === 0) return null // ถ้าไม่มีหนังสือในหมวดนี้ ไม่แสดง section
+            if (!shouldDisplayCategory(value)) return null
 
             return (
-              <section key={value} className="mb-8">
-                <h2 className="text-white text-2xl font-bold mb-6">
-                  {label}
-                </h2>
-                <BookGrid books={booksInCategory} />
-              </section>
+              <GenreSection
+                key={value}
+                genre={value}
+                label={label}
+                books={booksByGenre[value] || []}
+                loading={loadingByGenre[value] || false}
+                currentPage={pagesByGenre[value] || 1}
+                fetchBooksForGenre={fetchBooksForGenre}
+              />
             )
           })}
-
         </main>
       </div>
     </div>

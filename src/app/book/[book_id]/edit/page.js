@@ -16,7 +16,7 @@ export default function BookDetailPage() {
   const [isFollowing, setIsFollowing] = useState(false)
   const [isBookmarked, setIsBookmarked] = useState(false)
   const [rating, setRating] = useState(0)
-  const [isAuthor, setIsAuthor] = useState(true)
+  const [isAuthor, setIsAuthor] = useState(false)
   const [episodes, setEpisodes] = useState([])
   const [isStatusWriterEnded, setIsStatusWriterEnded] = useState(false)
   const { user, logout } = useAuth()
@@ -30,17 +30,15 @@ export default function BookDetailPage() {
         
         if (user && user.user && user.user.id && data.author_id) {
           if (user.user.id === data.author_id) {
-            setIsAuthor(true)
+            if(data.author_id == user.user.id){
+              setIsAuthor(true)
+            }
           }
         }
         setIsStatusWriterEnded(data.is_complete || false)
         setBook(data)
         setEpisodes(dataArr.episodes || []) // ใช้ [] ถ้าไม่มี
 
-        // แก้ให้เทียบ author id เป็น number
-        if (Number(data.author_id) === 14) {
-          setIsAuthor(true)
-        }
       } catch (err) {
         console.error("ไม่สามารถโหลดข้อมูลหนังสือได้:", err)
       }
@@ -51,7 +49,7 @@ export default function BookDetailPage() {
 
   const handleUnlockEpisode = (eid) => {
     setEpisodes((prev) =>
-      prev.map((ep) => (ep.id === eid ? { ...ep, isLocked: false, price: null } : ep))
+      prev.map((ep) => (ep.id === eid ? { ...ep, isLocked: true, price: null } : ep))
     )
   }
 
@@ -74,7 +72,7 @@ export default function BookDetailPage() {
 
 
   if (!book) {
-    return <div className="text-white p-8">กำลังโหลดข้อมูลหนังสือ...</div>
+    return <div className="text-white p-8">Loading books...</div>
   }
 
   return (
@@ -155,7 +153,7 @@ export default function BookDetailPage() {
               )}
             </div>
 
-            <EpisodesList episodes={episodes} onUnlock={handleUnlockEpisode} isAuthor={isAuthor} />
+            <EpisodesList episodes={episodes} onUnlock={handleUnlockEpisode} isAuthor={isAuthor} id={id} />
           </div>
         </div>
       </div>
