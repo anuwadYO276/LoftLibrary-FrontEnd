@@ -21,51 +21,49 @@ export default function AddBooks({ isEdit = false, editId = null }) {
   const [status, setStatus] = useState("draft")
   const authorId = user?.user?.id || null
 
-
-
-
-
   useEffect(() => {
-  const fetchBookData = async () => {
-    if (!isEdit || !editId || !user) return
-    try {
+    const fetchBookData = async () => {
+      if (!isEdit || !editId || !user) return
+      try {
         const dataArr = await getBookId(editId)
         const data = dataArr.product || {}
 
-      if (data) {
-        const url = process.env.NEXT_PUBLIC_API_URL || "" 
+        if (data) {
+          const url = process.env.NEXT_PUBLIC_API_URL || ""
 
-        setTitle(data.title || "")
-        setDescription(data.description || "")
-        setReleaseDate(data.release_date ? data.release_date.slice(0,10) : "")
-        setStatus(data.status || "draft")
-        
-        
-        if (data.category) {
-          const categoryArr = data.category.split(",").map(c => ({ value: c.trim(), label: c.trim() }))
-          setCategories(categoryArr)
-        } else {
-          setCategories([])
+          setTitle(data.title || "")
+          setDescription(data.description || "")
+          setReleaseDate(data.release_date ? data.release_date.slice(0, 10) : "")
+          setStatus(data.status || "draft")
+
+          if (data.category) {
+            const categoryArr = data.category
+              .split(",")
+              .map((c) => ({ value: c.trim(), label: c.trim() }))
+            setCategories(categoryArr)
+          } else {
+            setCategories([])
+          }
+
+          if (data.cover_url) setCoverPreview(`${url}${data.cover_url}`)
+          else setCoverPreview(null)
         }
-        
-        if (data.cover_url) setCoverPreview(`${url}${data.cover_url}`)
-        else setCoverPreview(null)
+      } catch (err) {
+        console.error("Error loading book:", err.message)
+        alert("Unable to load book data: " + err.message)
       }
-
-    } catch (err) {
-      console.error("Error loading book:", err.message)
-      alert("ไม่สามารถโหลดข้อมูลหนังสือได้: " + err.message)
     }
-  }
 
-  fetchBookData()
-}, [isEdit, editId, user])
-
-
+    fetchBookData()
+  }, [isEdit, editId, user])
 
   useEffect(() => {
     return () => {
-      if (coverPreview && typeof coverPreview === "string" && coverPreview.startsWith("blob:")) {
+      if (
+        coverPreview &&
+        typeof coverPreview === "string" &&
+        coverPreview.startsWith("blob:")
+      ) {
         URL.revokeObjectURL(coverPreview)
       }
     }
@@ -80,7 +78,7 @@ export default function AddBooks({ isEdit = false, editId = null }) {
       setCoverFile(file)
       setCoverPreview(URL.createObjectURL(file))
     } else {
-      alert("กรุณาอัปโหลดไฟล์ .jpg หรือ .png เท่านั้น")
+      alert("Please upload .jpg or .png files only")
     }
   }
 
@@ -94,7 +92,7 @@ export default function AddBooks({ isEdit = false, editId = null }) {
 
   const handleSubmit = async () => {
     if (!authorId) {
-      alert("คุณยังไม่ได้เข้าสู่ระบบ")
+      alert("You are not logged in")
       return
     }
 
@@ -105,7 +103,7 @@ export default function AddBooks({ isEdit = false, editId = null }) {
       status,
       categories,
       coverFile,
-      authorId
+      authorId,
     }
 
     try {
@@ -116,24 +114,24 @@ export default function AddBooks({ isEdit = false, editId = null }) {
       if (bookId) {
         router.push(`/book/${bookId}`)
       } else {
-        throw new Error("ไม่พบ ID ของหนังสือหลังจากบันทึก")
+        throw new Error("Book ID not found after saving")
       }
     } catch (err) {
       console.error(err)
-      alert("ไม่สามารถบันทึกหนังสือได้")
+      alert("Unable to save the book")
     }
   }
 
   return (
     <div className="p-6">
       <h1 className="text-3xl font-bold text-teal-300 mb-6">
-        {isEdit ? "แก้ไขหนังสือ" : "เพิ่มหนังสือใหม่"}
+        {isEdit ? "Edit Book" : "Add New Book"}
       </h1>
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
         {/* COVER UPLOAD */}
         <div className="md:col-span-4">
-          <label className="block text-sm mb-1 text-teal-300">อัปโหลดหน้าปก</label>
+          <label className="block text-sm mb-1 text-teal-300">Upload Cover</label>
           <div
             className="border-2 border-dashed rounded-lg p-4 flex flex-col items-center justify-center cursor-pointer hover:border-teal-600 transition-colors"
             onClick={() => document.getElementById("coverInput").click()}
@@ -147,8 +145,10 @@ export default function AddBooks({ isEdit = false, editId = null }) {
             />
             {!coverPreview ? (
               <div className="text-teal-400 text-center select-none h-100">
-                <p className="mt-20 mb-1 text-lg font-semibold">คลิกหรือวางไฟล์เพื่ออัปโหลด</p>
-                <p className="text-sm">รองรับ .jpg, .jpeg, .png</p>
+                <p className="mt-20 mb-1 text-lg font-semibold">
+                  Click or drop file to upload
+                </p>
+                <p className="text-sm">Supported: .jpg, .jpeg, .png</p>
               </div>
             ) : (
               <div className="flex flex-col items-center">
@@ -164,7 +164,7 @@ export default function AddBooks({ isEdit = false, editId = null }) {
                     handleRemoveFile()
                   }}
                 >
-                  ลบภาพหน้าปก
+                  Remove Cover Image
                 </button>
               </div>
             )}
@@ -174,7 +174,7 @@ export default function AddBooks({ isEdit = false, editId = null }) {
         {/* RIGHT SIDE FORM */}
         <div className="md:col-span-8 space-y-4">
           <div>
-            <label className="block text-sm mb-1 text-teal-300">ชื่อหนังสือ</label>
+            <label className="block text-sm mb-1 text-teal-300">Book Title</label>
             <input
               className="w-full border p-2 rounded"
               value={title}
@@ -183,7 +183,7 @@ export default function AddBooks({ isEdit = false, editId = null }) {
           </div>
 
           <div>
-            <label className="block text-sm mb-1 text-teal-300">รายละเอียด</label>
+            <label className="block text-sm mb-1 text-teal-300">Description</label>
             <textarea
               className="w-full border p-2 rounded"
               rows={4}
@@ -193,7 +193,7 @@ export default function AddBooks({ isEdit = false, editId = null }) {
           </div>
 
           <div>
-            <label className="block text-sm mb-1 text-teal-300">หมวดหมู่</label>
+            <label className="block text-sm mb-1 text-teal-300">Category</label>
             <NoSSRSelect
               options={genreOptions}
               value={categories}
@@ -201,12 +201,12 @@ export default function AddBooks({ isEdit = false, editId = null }) {
               isMulti
               className="basic-multi-select text-black"
               classNamePrefix="select"
-              placeholder="เลือกหมวดหมู่"
+              placeholder="Select categories"
             />
           </div>
 
           <div>
-            <label className="block text-sm mb-1 text-teal-300">วันที่เผยแพร่</label>
+            <label className="block text-sm mb-1 text-teal-300">Release Date</label>
             <input
               type="date"
               className="w-full border p-2 rounded"
@@ -216,7 +216,7 @@ export default function AddBooks({ isEdit = false, editId = null }) {
           </div>
 
           <div>
-            <label className="block text-sm mb-1 text-teal-300">สถานะ</label>
+            <label className="block text-sm mb-1 text-teal-300">Status</label>
             <NoSSRSelect
               options={statusOptions}
               value={statusOptions.find((opt) => opt.value === status)}
@@ -233,7 +233,7 @@ export default function AddBooks({ isEdit = false, editId = null }) {
           className="bg-teal-500 text-white px-6 py-2 rounded-md hover:bg-teal-600"
           onClick={handleSubmit}
         >
-          {isEdit ? "บันทึกการแก้ไข" : "บันทึกหนังสือ"}
+          {isEdit ? "Save Changes" : "Save Book"}
         </Button>
       </div>
     </div>
