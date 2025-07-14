@@ -13,7 +13,7 @@ export default function GenreFilter({ genreOptions, selectedGenres, toggleGenre,
           className:
             'mr-2 mb-2 px-4 py-2 rounded ' +
             (selectedGenres.includes(value)
-              ? 'bg-blue-500 text-white'
+              ? 'bg-teal-500 text-white'
               : 'bg-gray-700 text-white'),
         },
         label
@@ -27,8 +27,8 @@ export default function GenreFilter({ genreOptions, selectedGenres, toggleGenre,
           className:
             'mr-2 mb-2 px-4 py-2 rounded ' +
             (selectedGenres.length === 0
-              ? 'bg-blue-500 text-white'
-              : 'bg-gray-700 text-white'),
+              ? 'bg-teal-500 text-white'
+              : 'bg-gray-700 text-white'), 
         },
         'All'
       )

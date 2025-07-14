@@ -60,6 +60,16 @@ export default function Header({ onSearch }) {
               onChange={handleInputChange}
             />
           </div>
+          {/* Add button to clear search */}
+          <button
+            onClick={() => {
+              setSearchText("")
+              onSearch("")
+            }}
+            className="text-gray-400 hover:text-gray-600"
+          >
+            Clear
+          </button>
         </div>
 
         <div className="flex items-center gap-4">

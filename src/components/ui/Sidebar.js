@@ -12,6 +12,7 @@ export default function Sidebar() {
   const [currentlyPlaying, setCurrentlyPlaying] = useState(false)
     const { user, logout } = useAuth()
     const router = useRouter()
+    console.log("User:", user)
 
   return (
     <div className="w-64 bg-custom-bg border-r border-white flex flex-col">
@@ -39,6 +40,7 @@ export default function Sidebar() {
 
           {user?.user ? (
             <>
+              
               {user.user.role == "author" ? (
                 <TextLink href="/add-books" className="w-full flex items-center gap-3 text-white hover:bg-gray-700 p-2 rounded">
                   <Plus className="w-4 h-4" />
