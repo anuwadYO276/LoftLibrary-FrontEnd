@@ -10,7 +10,7 @@ import CustomAlertModal from "@/components/ui/CustomAlertModal"
 import { updatePenName } from "@/lib/api/auth"
 
 export default function AddBRolePage() {
-  const { user, logout } = useAuth()
+  const { user, setUser } = useAuth()
   const router = useRouter()
 
   const [penName, setPenName] = useState("")
@@ -54,9 +54,16 @@ export default function AddBRolePage() {
     setLoading(true)
     try {
       const data = await updatePenName(penName, user.user.id)
-      console.log("Update pen name response:", data)
-
       if (data.statusCode === 200 || data.statusCode === 201) {
+         const updatedUser = {
+            ...user,
+            user: {
+              ...user.user,
+              role: "author", // หรือ "2", แล้วแต่ระบบคุณใช้ string หรือ number
+            },
+          }
+          setUser(updatedUser)
+        // console.log("Updated User:", set_role)
         setModalInfo({
           type: "success",
           title: "Role Updated",

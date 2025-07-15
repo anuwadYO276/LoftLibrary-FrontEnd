@@ -24,7 +24,6 @@ export default function BookDetailPage() {
   const router = useRouter()
 
   
-  console.log("User:", user)
 
   useEffect(() => {
     if (!user) {

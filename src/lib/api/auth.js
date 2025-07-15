@@ -62,7 +62,6 @@ export async function updatePenName(penName, authorId) {
     },
     body: JSON.stringify({ pen_name: penName, userId: authorId }),
   })
-
   if (!res.ok) {
     const error = await res.json()
     throw new Error(error.message || "Update pen name failed")
