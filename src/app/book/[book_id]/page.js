@@ -27,10 +27,10 @@ export default function BookDetailPage() {
 
   useEffect(() => {
     if (isLoading) return
-    if (!user) {
-      router.push("/login") // ถ้าไม่ login ให้ redirect
-      return
-    }
+    // if (!user) {
+    //   router.push("/login") // ถ้าไม่ login ให้ redirect
+    //   return
+    // }
     if (!id) return
 
     const fetchBook = async () => {
@@ -126,9 +126,10 @@ export default function BookDetailPage() {
               }
               isStatusWriterEnded={isStatusWriterEnded}
               isAuthor={isAuthor}
-              id={id}
+              bookId={id}
               category={book.category || "Uncategorized"}
               followers={book.followers || 0}
+              userId={user.user.id}
             />
           </div>
 
