@@ -3,7 +3,23 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Bookmark, Heart } from "lucide-react"
 
-export default function BookInfo({ rating, setRating, isBookmarked, setIsBookmarked, isFollowing, setIsFollowing, title, author, description, authorAvatar, isStatusWriterEnded,isAuthor,id ,category}) {
+export default function BookInfo(
+  { rating
+    , setRating
+    , isBookmarked
+    , setIsBookmarked
+    , isFollowing
+    , setIsFollowing
+    , title
+    , author
+    , description
+    , authorAvatar
+    , isStatusWriterEnded
+    , isAuthor
+    , id 
+    , category
+    , followers
+}) {
   const renderStars = (currentRating) => {
     return Array.from({ length: 5 }, (_, i) => {
       const starIndex = i + 1
@@ -81,7 +97,8 @@ export default function BookInfo({ rating, setRating, isBookmarked, setIsBookmar
 
         
         <span className="text-xl text-gray-300">{author}</span>
-        <Button
+         {!isAuthor ? (
+          <Button
           variant="outline"
           size="sm"
           onClick={() => setIsFollowing(!isFollowing)}
@@ -89,6 +106,13 @@ export default function BookInfo({ rating, setRating, isBookmarked, setIsBookmar
         >
           {isFollowing ? "Following" : "Follow"}
         </Button>
+        ) : (
+          <>
+          <span className="text-xl text-gray-300">
+            Followers: {followers}
+          </span>
+          </>
+        )}
       </div>
 
       <p className="text-gray-300 text-lg leading-relaxed mb-6 max-w-3xl">
