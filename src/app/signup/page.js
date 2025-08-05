@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input"
 import TextLink from "@/components/ui/TextLink"
 import { useRouter } from "next/navigation"
 import { register } from "@/lib/api/auth"
-import { useAuth } from "@/contexts/AuthContext"
 import CustomAlertModal from "@/components/ui/CustomAlertModal"
 
 export default function SignupPage() {
@@ -24,7 +23,6 @@ export default function SignupPage() {
     message: "",
   })
 
-  const { setUser } = useAuth()
   const router = useRouter()
 
   const handleSubmit = async (e) => {
@@ -43,23 +41,18 @@ export default function SignupPage() {
     const signupData = {
       email,
       username,
-      password,
-      role: "Reader",
-      pen_name: "",
+      password
     }
 
     try {
       setLoading(true)
       setError(null)
-
-      const data = await register(signupData)
-      console.log("Signup successful:", data)
-
-      if (data.statusCode === 200 || data.statusCode === 201) {
+      const result = await register(signupData);
+      if (result.status_code === 200 || result.status_code === 201) {
         setModalInfo({
           type: "success",
           title: "Signup Successful",
-          message: "Your account has been created successfully!",
+          message: result.detail || "You have successfully signed up.",
         })
         setShowModal(true)
         return
@@ -67,7 +60,7 @@ export default function SignupPage() {
         setModalInfo({
           type: "error",
           title: "Signup Failed",
-          message: data.message || "An error occurred during signup.",
+          message: result.detail || "An error occurred during signup.",
         })
         setShowModal(true)
       }
