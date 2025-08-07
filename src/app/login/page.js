@@ -25,46 +25,52 @@ export default function LoginPage() {
   const { setUser } = useAuth()
   const router = useRouter()
 
+  
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
     try {
-      setLoading(true)
-      setError(null)
+      setLoading(true);
+      setError(null);
 
-      const result = await login({ email, password })
-      console.log("Login result:", result)
+      const result = await login({ email, password });
+      console.log("Login result:", result);
+
       if (result.status_code === 200 || result.status_code === 201) {
         setModalInfo({
           type: "success",
           title: "Login Successful",
           message: result.status_message || "You have successfully logged in.",
-        })
-        setShowModal(true)
+        });
+        setShowModal(true);
 
-        // Save user to context if result.data contains user info
-        if (result.data) {
-          setUser(result.data)
+        // ✅ เก็บข้อมูล user และ token อย่างถูกต้อง
+        if (result.detail?.payload) {
+          const userData = result.detail.payload;
+          const token = result.detail.token;
+
+          setUser(userData);
+          sessionStorage.setItem("user", JSON.stringify(userData));
+          sessionStorage.setItem("token", token);
+
+          setEmail("");
+          setPassword("");
         }
-
-        // Clear form
-        setEmail("")
-        setPassword("")
       } else {
         setModalInfo({
           type: "error",
           title: "Login Failed",
           message: result.detail || "An error occurred during login.",
-        })
-        setShowModal(true)
-
+        });
+        setShowModal(true);
       }
     } catch (err) {
-      setError(err.message || "Login failed")
+      setError(err.message || "Login failed");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
+
 
   const handleModalConfirm = () => {
     setShowModal(false)

@@ -1,17 +1,29 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import TextLink from "@/components/ui/TextLink"
 import NowPlaying from "@/components/ui/NowPlaying"
-import { Calendar, Clock, Bookmark, Book, Plus} from "lucide-react"
-import { useAuth } from "@/contexts/AuthContext"
+import { Calendar, Clock, Bookmark, Book, Plus } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 export default function Sidebar() {
   const [currentlyPlaying, setCurrentlyPlaying] = useState(false)
-    const { user, logout } = useAuth()
-    const router = useRouter()
+  const [user, setUser] = useState(null)
+  const router = useRouter()
+
+  // 🔄 โหลด user จาก sessionStorage ตอน component mount
+  useEffect(() => {
+    const storedUser = sessionStorage.getItem("user")
+    if (storedUser) {
+      try {
+        setUser(JSON.parse(storedUser))
+      } catch (err) {
+        console.error("Failed to parse user from sessionStorage", err)
+      }
+    }
+  }, [])
+
 
   return (
     <div className="w-64 bg-custom-bg border-r border-white flex flex-col">
@@ -24,7 +36,7 @@ export default function Sidebar() {
 
       <div className="flex-1 p-4">
         <nav className="space-y-2">
-          <TextLink href="/" className="w-full flex items-center gap-3 text-white hover:bg-gray-700 p-2 rounded">
+          <TextLink href="/Daily" className="w-full flex items-center gap-3 text-white hover:bg-gray-700 p-2 rounded">
             <Calendar className="w-4 h-4" />
             Daily
           </TextLink>
@@ -37,21 +49,7 @@ export default function Sidebar() {
             Bookmark
           </TextLink>
 
-          {user?.user ? (
-            <>
-              {user.user.role == "author" ? (
-                <TextLink href="/add-books" className="w-full flex items-center gap-3 text-white hover:bg-gray-700 p-2 rounded">
-                  <Plus className="w-4 h-4" />
-                  Add Books
-                </TextLink>
-              ) : (
-                <TextLink href="/add-role" className="w-full flex items-center gap-3 text-white hover:bg-gray-700 p-2 rounded">
-                  <Plus className="w-4 h-4" />
-                  Register as Author
-                </TextLink>
-              )}
-            </>
-          ) : null}
+        
         </nav>
       </div>
 
@@ -63,10 +61,3 @@ export default function Sidebar() {
     </div>
   )
 }
-
-
-
-
-
-
-
