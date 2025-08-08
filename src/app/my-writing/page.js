@@ -100,6 +100,10 @@ export default function MyWritingPage() {
           {/* แสดงรายการหนังสือของ user ที่นี่ */}
           <h1 className="text-2xl font-bold mb-4">My Writing</h1>
 
+          <a href="/add-books" className="mb-4 inline-block bg-mint-light text-white px-4 py-2 rounded hover:bg-mint-dark transition-colors">
+            Create New Book
+          </a>
+
           {books.length === 0 ? (
             <p>No books found.</p>
           ) : (

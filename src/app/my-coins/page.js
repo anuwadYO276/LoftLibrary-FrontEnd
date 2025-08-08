@@ -200,9 +200,25 @@ export default function MyCoinsPage() {
                         <td className="px-4 py-2 border-b text-center">
                           {transaction.description || "-"}
                         </td>
-                        <td className="px-4 py-2 border-b text-center">
-                          {new Date(transaction.created_at).toLocaleDateString()} : {new Date(transaction.created_at).toLocaleTimeString()}
-                        </td>
+                     <td className="px-4 py-2 border-b text-center">
+                      {new Date(transaction.created_at).toLocaleDateString("th-TH", {
+                        year: "numeric",
+                        month: "numeric",
+                        day: "numeric",
+                        timeZone: "UTC"   // date from UTC (keeps day 7/8 as in API)
+                      })}{" "}
+                      {" "}
+                      {new Date(transaction.created_at).toLocaleTimeString("th-TH", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        second: "2-digit",
+                        hour12: false,
+                        timeZone: "Asia/Bangkok" // time shifted to Thai local time
+                      })}
+                    </td>
+
+
+
                       </tr>
                     ))
                   )}

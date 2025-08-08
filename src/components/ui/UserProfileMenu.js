@@ -69,7 +69,13 @@ export default function UserProfileMenu() {
     router.push("/login")
   }
 
-  if (!profile) return null
+  if (!profile){
+    // logout()
+    // sessionStorage.removeItem("user")
+    // sessionStorage.removeItem("token")
+    // router.push("/login")
+    return null
+  }
 
   return (
     <div className="relative" ref={menuRef}>
@@ -93,7 +99,7 @@ export default function UserProfileMenu() {
 
       {/* เมนูแบบการ์ด */}
       {open && (
-        <div className="absolute right-0 mt-2 w-56 bg-gray-900 rounded-lg shadow-lg border text-white z-50">
+        <div className="absolute right-0 mt-2 w-56 bg-gray-800 rounded-lg shadow-lg border text-white z-50">
           <div className="p-4 flex flex-col gap-3">
             {/* แถวบน: รูป + ชื่อ */}
             <div className="flex items-center gap-3 border-b border-gray-200 pb-3">

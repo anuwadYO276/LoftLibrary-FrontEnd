@@ -10,16 +10,9 @@ import { getCoins } from "@/lib/api/book"
 import { useRouter } from "next/navigation"
 import Select from "@/components/ui/Select"
 import { Input } from "@/components/ui/input"
+
 const getDaysInMonth = (year, month) => {
   return new Date(year, month + 1, 0).getDate()
-}
-
-const isSameDay = (date1, date2) => {
-  return (
-    date1.getDate() === date2.getDate() &&
-    date1.getMonth() === date2.getMonth() &&
-    date1.getFullYear() === date2.getFullYear()
-  )
 }
 
 export default function DailyCalendarPage() {
@@ -75,17 +68,17 @@ export default function DailyCalendarPage() {
   const today = new Date()
   const firstDay = new Date(selectedYear, selectedMonth, 1).getDay()
 
-  const transactionDates = transactions.map((t) => new Date(t.created_at))
-
-const isTransactionDay = (day) => {
-  return transactionDates.some(
-    (txDate) =>
-      txDate.getDate() === day &&
-      txDate.getMonth() === selectedMonth &&
-      txDate.getFullYear() === selectedYear &&
-      txDate.type === "daily_checkin"
-  );
-};
+  const isTransactionDay = (day) => {
+    return transactions.some((t) => {
+      const txDate = new Date(t.created_at)
+      return (
+        txDate.getUTCDate() === day &&
+        txDate.getUTCMonth() === selectedMonth &&
+        txDate.getUTCFullYear() === selectedYear &&
+        t.type === "daily_checkin"
+      )
+    })
+  }
 
 
   return (
@@ -109,7 +102,9 @@ const isTransactionDay = (day) => {
 
             <main className="flex-1 p-6 overflow-y-auto text-white">
               <h1 className="text-2xl font-bold mb-4">Daily Login Calendar</h1>
-              <p className="mb-4">You have <strong>{coins}</strong> coins.</p>
+              <p className="mb-4">
+                You have <strong>{coins}</strong> coins.
+              </p>
 
               <div className="flex gap-4 items-center mb-6">
                 <Select
@@ -117,13 +112,12 @@ const isTransactionDay = (day) => {
                   onChange={(e) => setSelectedMonth(Number(e.target.value))}
                   options={Array.from({ length: 12 }, (_, i) => ({
                     value: i,
-                    label: new Date(0, i).toLocaleString("default", { month: "long" }),
+                    label: new Date(0, i).toLocaleString("default", {
+                      month: "long",
+                    }),
                   }))}
                   className="w-48"
                 />
-
-
-
 
                 <Input
                   type="number"
@@ -132,11 +126,15 @@ const isTransactionDay = (day) => {
                   className="text-black p-2 rounded w-24"
                 />
               </div>
-              <div className="grid grid-cols-7 gap-2 text-center text-white border bg-teal-600 rounded-lg p-4">
 
-                {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-                  <div key={day} className="font-semibold">{day}</div>
-                ))}
+              <div className="grid grid-cols-7 gap-2 text-center text-white border bg-teal-600 rounded-lg p-4">
+                {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(
+                  (day) => (
+                    <div key={day} className="font-semibold">
+                      {day}
+                    </div>
+                  )
+                )}
 
                 {Array.from({ length: firstDay }).map((_, i) => (
                   <div key={`empty-${i}`} className="p-4" />

@@ -4,9 +4,9 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import NoSSRSelect from "@/components/ui/NoSSRSelect"
 import { useRouter } from "next/navigation"
-import { createBook, updateBook, getBookId } from "@/lib/api/book"
+import { updateBook, getBookId } from "@/lib/api/book"  // เปลี่ยนมาใช้ saveBook
 import { useAuth } from "@/contexts/AuthContext"
-import { genreOptions, statusOptions } from "@/constants/selectOptions"
+import { genreOptions } from "@/constants/selectOptions"
 
 export default function AddBooks({ isEdit = false, editId = null }) {
   const { user } = useAuth()
@@ -15,37 +15,52 @@ export default function AddBooks({ isEdit = false, editId = null }) {
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
   const [categories, setCategories] = useState([])
-  const [coverFile, setCoverFile] = useState(null)
+  const [booksFile, setBooksFile] = useState(null)  // เปลี่ยนจาก coverFile เป็น booksFile
   const [coverPreview, setCoverPreview] = useState(null)
   const [releaseDate, setReleaseDate] = useState("")
   const [status, setStatus] = useState("draft")
-  const authorId = user?.user?.id || null
+  const [authorId, setAuthorId] = useState(null)
+  const [loadingUser, setLoadingUser] = useState(true)
+
+  useEffect(() => {
+    if (user !== undefined) {
+      setLoadingUser(false)
+      setAuthorId(user?.id || null)
+    }
+  }, [user])
+
+  useEffect(() => {
+    if (!loadingUser && !user) {
+      router.push("/login")
+    }
+  }, [user, loadingUser, router])
 
   useEffect(() => {
     const fetchBookData = async () => {
       if (!isEdit || !editId || !user) return
       try {
-        const dataArr = await getBookId(editId)
-        const data = dataArr.product || {}
+        const res = await getBookId(editId)
+        let data = res.detail || {}
+        console.log("Fetched book data:", data)
 
         if (data) {
           const url = process.env.NEXT_PUBLIC_API_URL || ""
 
           setTitle(data.title || "")
           setDescription(data.description || "")
-          setReleaseDate(data.release_date ? data.release_date.slice(0, 10) : "")
-          setStatus(data.status || "draft")
 
-          if (data.category) {
-            const categoryArr = data.category
-              .split(",")
-              .map((c) => ({ value: c.trim(), label: c.trim() }))
+          if (data.categories && Array.isArray(data.categories)) {
+            const categoryArr = data.categories.map(cat => ({
+              value: cat.name,
+              label: cat.name,
+            }))
             setCategories(categoryArr)
           } else {
             setCategories([])
           }
 
-          if (data.cover_url) setCoverPreview(`${url}${data.cover_url}`)
+
+          if (data.cover_image) setCoverPreview(`${url}/uploads/books/${data.cover_image}`)
           else setCoverPreview(null)
         }
       } catch (err) {
@@ -75,7 +90,7 @@ export default function AddBooks({ isEdit = false, editId = null }) {
       if (coverPreview && coverPreview.startsWith("blob:")) {
         URL.revokeObjectURL(coverPreview)
       }
-      setCoverFile(file)
+      setBooksFile(file)  // เปลี่ยนจาก setCoverFile เป็น setBooksFile
       setCoverPreview(URL.createObjectURL(file))
     } else {
       alert("Please upload .jpg or .png files only")
@@ -86,7 +101,7 @@ export default function AddBooks({ isEdit = false, editId = null }) {
     if (coverPreview && coverPreview.startsWith("blob:")) {
       URL.revokeObjectURL(coverPreview)
     }
-    setCoverFile(null)
+    setBooksFile(null)  // เปลี่ยนจาก setCoverFile เป็น setBooksFile
     setCoverPreview(null)
   }
 
@@ -95,26 +110,28 @@ export default function AddBooks({ isEdit = false, editId = null }) {
       alert("You are not logged in")
       return
     }
-
+    
     const payload = {
+      bookId: editId ? editId : null,
       title,
       description,
-      releaseDate,
-      status,
-      categories,
-      coverFile,
-      authorId,
+      categories: categories.length > 0
+        ? categories.map(cat => cat.value || cat).join(",")
+        : "",
+      booksFile,
+      userId: authorId
     }
-
+    
     try {
-      const result = isEdit
-        ? await updateBook(editId, payload)
-        : await createBook(payload)
-      const bookId = result?.id
-      if (bookId) {
-        router.push(`/book/${bookId}`)
-      } else {
-        throw new Error("Book ID not found after saving")
+      const result = await updateBook(payload)
+      if(result && (result.status_code === 201 || result.status_code === 200)) {
+        const bookId = result?.detail?.bookId || null
+        console.log("Book ID after saving:", bookId)
+        if (bookId) {
+          router.push(`/add-books/${bookId}`)
+        } else {
+          throw new Error("Book ID not found after saving")
+        }
       }
     } catch (err) {
       console.error(err)
@@ -205,26 +222,6 @@ export default function AddBooks({ isEdit = false, editId = null }) {
             />
           </div>
 
-          <div>
-            <label className="block text-sm mb-1 text-teal-300">Release Date</label>
-            <input
-              type="date"
-              className="w-full border p-2 rounded"
-              value={releaseDate}
-              onChange={(e) => setReleaseDate(e.target.value)}
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm mb-1 text-teal-300">Status</label>
-            <NoSSRSelect
-              options={statusOptions}
-              value={statusOptions.find((opt) => opt.value === status)}
-              onChange={(selected) => setStatus(selected.value)}
-              className="text-black"
-              classNamePrefix="select"
-            />
-          </div>
         </div>
       </div>
 

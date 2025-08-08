@@ -127,7 +127,6 @@ export default function MyProfilePage() {
 
     // เรียก API
     const res = await updateProfile(formData)
-    console.log("Update profile response:", res)
     if (res.status_code === 200) {
       setModalInfo({
         type: "success",

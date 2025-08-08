@@ -138,6 +138,63 @@ export async function updateProfile(formData) {
 
 
 
+// ✏️ Update existing book
+export async function updateBook(data) {
+  const formData = new FormData();
+
+  if (data.bookId) {
+    formData.append("bookId", data.bookId);
+  }
+
+  formData.append("title", data.title || "");
+  formData.append("userId", data.userId || "");
+  formData.append("description", data.description || "");
+  formData.append("category", data.categories || "");
+  
+  if (data.booksFile) {
+    formData.append("books", data.booksFile);
+  }
+
+  try {
+    const res = await axios.post(`${BASE_URL}/api/books/`, formData, {
+      headers: {
+        Authorization: getBasicAuthHeader(), // หรือใส่ header ตรงนี้เป็น string
+      },
+    });
+    return res.data;
+  } catch (error) {
+    if (error.response) {
+      throw new Error(error.response.data.message || "Failed to save book");
+    } else {
+      throw new Error(error.message || "Network Error");
+    }
+  }
+}
+
+
+// 📗 Get book by ID
+export async function getBookId(id) {
+  try {
+    const res = await axios.get(`${BASE_URL}/api/books/${id}`, {
+      headers: {
+        Authorization: getBasicAuthHeader(),
+      },
+    })
+
+    return res.data
+
+  } catch (error) {
+    if (error.response) {
+      throw new Error(error.response.data.message || "Failed to fetch book")
+    } else {
+      throw new Error(error.message || "Network Error")
+    }
+  }
+}
+
+
+
+
 // 📘 Create a new book
 export async function createBook(data) {
   const formData = new FormData()
@@ -176,63 +233,8 @@ export async function createBook(data) {
   }
 }
 
-// ✏️ Update existing book
-export async function updateBook(id, data) {
-  const formData = new FormData()
-  formData.append("title", data.name || data.title)
-  formData.append("description", data.description)
-  formData.append("release_date", data.releaseDate || data.release_date)
-  formData.append("status", data.status)
-  formData.append("price_per_chapter", data.pricePerChapter || 0)
-  formData.append("author_id", data.authorId)
 
-  if (data.categories?.length > 0) {
-    const categoriesString = data.categories.map(cat => cat.value || cat).join(",")
-    formData.append("category", categoriesString)
-  }
 
-  if (data.coverFile) {
-    formData.append("cover", data.coverFile)
-  }
-
-  try {
-    const res = await axios.put(`${BASE_URL}/product/${id}`, formData, {
-      headers: {
-        Authorization: getBasicAuthHeader(),
-        // ไม่ต้องใส่ Content-Type เอง เพราะ axios จะจัดการให้
-      },
-    })
-
-    return res.data.data
-
-  } catch (error) {
-    if (error.response) {
-      throw new Error(error.response.data.message || "Failed to update book")
-    } else {
-      throw new Error(error.message || "Network Error")
-    }
-  }
-}
-
-// 📗 Get book by ID
-export async function getBookId(id) {
-  try {
-    const res = await axios.get(`${BASE_URL}/product/${id}`, {
-      headers: {
-        Authorization: getBasicAuthHeader(),
-      },
-    })
-
-    return res.data.data
-
-  } catch (error) {
-    if (error.response) {
-      throw new Error(error.response.data.message || "Failed to fetch book")
-    } else {
-      throw new Error(error.message || "Network Error")
-    }
-  }
-}
 
 // ✅ Update book "complete" status
 export async function updateIsComplete(id, isComplete) {
