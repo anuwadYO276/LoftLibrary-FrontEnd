@@ -24,11 +24,10 @@ export default function AddEpisodes({ isEdit = false, editId = null, bookId, rou
       if (isEdit && editId && bookId) {
         try {
           const episodeArr = await getEpisodeID(bookId, editId)
-          const episode = episodeArr[0] || {}
-          console.log("Loaded episode:", episode)
+          const episode = episodeArr.detail || {}
           if (episode) {
             setChapterTitle(episode.title || "")
-            setChapterContent(episode.content_text || "")
+            setChapterContent(episode.content || "")
             if (episode.release_date) {
               const isoDate = new Date(episode.release_date)
               const formattedDate = isoDate.toISOString().split("T")[0]

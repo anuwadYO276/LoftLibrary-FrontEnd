@@ -25,13 +25,13 @@ export async function getEpisodeProduct(bookId) {
 // 🔍 Get a specific episode by bookId and episodeId
 export async function getEpisodeID(bookId, episodeId) {
   try {
-    const res = await axios.get(`${BASE_URL}/episode/${bookId}/${episodeId}`, {
+    const res = await axios.get(`${BASE_URL}/api/episodes/${bookId}/${episodeId}`, {
       headers: {
         Authorization: getBasicAuthHeader(),
       },
     })
 
-    return res.data.data || []
+    return res.data || []
   } catch (error) {
     const message = error.response?.data?.message || "Failed to fetch episode"
     throw new Error(message)
