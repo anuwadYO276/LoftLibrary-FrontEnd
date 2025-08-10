@@ -68,7 +68,6 @@ const handleRating = async (newRating) => {
     }
   }
 
-  console.log("rating:", rating)
   return (
     <div>
       <div className="flex items-center gap-4 mb-2">
@@ -85,6 +84,21 @@ const handleRating = async (newRating) => {
         <h1 className="flex-1 text-4xl font-bold truncate">
             {title}
         </h1>
+
+          {isAuthor ? (
+        <a
+          href={`/add-books/${bookId}`} // แก้ id เป็นตัวแปรจริงจาก props/state
+          className="cursor-pointer p-2 rounded-full hover:bg-gray-700 transition-colors flex items-center justify-center"
+          aria-label="Edit book"
+        >
+         <button className="w-6 h-6 text-teal-400 hover:text-mint-light transition-colors">
+            Edit
+         </button>
+        </a>
+
+      ) : (
+        <></>
+      )}
 
         {/* <span
             onClick={() => setIsBookmarked(!isBookmarked)}

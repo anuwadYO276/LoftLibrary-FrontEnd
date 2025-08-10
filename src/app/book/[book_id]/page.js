@@ -36,6 +36,7 @@ export default function BookDetailPage() {
     const fetchBook = async () => {
       try {
         const dataArr = await getBookId(id)
+        console.log("Fetched book data:", dataArr)
         const data = dataArr.detail || {}
 
         // console.log("Fetched book data:", data)
@@ -55,7 +56,7 @@ export default function BookDetailPage() {
 
         setIsStatusWriterEnded(data.is_complete || false)
         setBook(data)
-        setEpisodes(dataArr.episodes || [])
+        setEpisodes(data.episodes || [])
       } catch (err) {
         console.error("ไม่สามารถโหลดข้อมูลหนังสือได้:", err)
       }
@@ -80,7 +81,7 @@ export default function BookDetailPage() {
   const handleSetIsStatusWriterEnded = async (value) => {
     setIsStatusWriterEnded(value)
 
-    if (user?.user?.id && id) {
+    if (user?.id && id) {
       try {
         await updateIsComplete(id, value)
       } catch (err) {

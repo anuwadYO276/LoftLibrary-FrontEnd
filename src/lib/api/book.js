@@ -351,18 +351,20 @@ export async function createBook(data) {
 // ✅ Update book "complete" status
 export async function updateIsComplete(id, isComplete) {
   try {
-    const res = await axios.put(
-      `${BASE_URL}/product/${id}/status`,
-      { is_complete: isComplete },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: getBasicAuthHeader(),
-        },
-      }
-    )
+    console.log("Updating book status:", { bookId: id, isComplete })
+    const res = await axios.post(`${BASE_URL}/api/books/is_complete`, {
+      bookId: id,
+      isComplete: isComplete,
+    }, {
+      headers: {
+        Authorization: getBasicAuthHeader(),
+        "Content-Type": "application/json",
+      },
+    })
 
-    return res.data.data
+    console.log("Update book status response:", res.data)
+
+    return res.data
 
   } catch (error) {
     if (error.response) {
