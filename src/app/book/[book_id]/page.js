@@ -5,7 +5,7 @@ import BookInfo from "@/components/ui/BookInfo"
 import EpisodesList from "@/components/ui/EpisodesList"
 import Sidebar from "@/components/ui/Sidebar"
 import Header from "@/components/ui/Header"
-import { getBookId, updateIsComplete } from "@/lib/api/book"
+import { getBookId, updateIsComplete, getIsFollowing } from "@/lib/api/book"
 import { useParams, useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/AuthContext"
 
@@ -46,6 +46,9 @@ export default function BookDetailPage() {
           if (user.id == data.user_id) {
             setIsAuthor(true)
           } else {
+            const dataFollowing = await getIsFollowing(user.id, data.id)
+            setIsFollowing(dataFollowing.detail.isFollowing || false)
+            setRating(dataFollowing.detail.ratings || 0)
             setIsAuthor(false)
           }
         }

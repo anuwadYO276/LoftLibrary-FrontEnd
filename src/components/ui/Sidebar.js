@@ -44,7 +44,7 @@ export default function Sidebar() {
             <Clock className="w-4 h-4" />
             History
           </TextLink>
-          <TextLink href="/" className="w-full flex items-center gap-3 text-white hover:bg-gray-700 p-2 rounded">
+          <TextLink href="/Bookmark" className="w-full flex items-center gap-3 text-white hover:bg-gray-700 p-2 rounded">
             <Bookmark className="w-4 h-4" />
             Bookmark
           </TextLink>

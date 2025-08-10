@@ -98,11 +98,17 @@ export default function MyWritingPage() {
 
         <main className="flex-1 p-6 overflow-y-auto text-white">
           {/* แสดงรายการหนังสือของ user ที่นี่ */}
-          <h1 className="text-2xl font-bold mb-4">My Writing</h1>
 
-          <a href="/add-books" className="mb-4 inline-block bg-mint-light text-white px-4 py-2 rounded hover:bg-mint-dark transition-colors">
-            Create New Book
-          </a>
+          <div className="flex justify-between items-center mb-4">
+            <h1 className="text-2xl font-bold">My Writing</h1>
+            <a
+              href="/add-books"
+              className="bg-mint-light text-white px-4 py-2 rounded hover:bg-mint-dark transition-colors"
+            >
+              Create New Book
+            </a>
+          </div>
+
 
           <table className="min-w-full mt-6">
             <thead>
@@ -115,21 +121,29 @@ export default function MyWritingPage() {
               </tr>
             </thead>
             <tbody>
-              {books.map((book) => (
-                <tr key={book.id}>
-                  <td className="px-4 py-2">{book.title}</td>
-                  <td className="px-4 py-2">{book.episodes ?? 0}</td>
-                  <td className="px-4 py-2">{book.favorites ?? 0}</td>
-                  <td className="px-4 py-2">{book.coins ?? 0}</td>
-                  <td className="px-4 py-2">
-                    {/* ปุ่มแก้ไข ไปที่ add-books/{book.id} */}
-                    <Button onClick={() => router.push(`/add-books/${book.id}`)}>
-                      Edit
-                    </Button>
-                    <Button className="ml-2" onClick={() => {}}>Delete</Button>
+             {Array.isArray(books) && books.length > 0 ? (
+                books.map((book) => (
+                  <tr key={book.id}>
+                    <td className="px-4 py-2">{book.title}</td>
+                    <td className="px-4 py-2">{book.episodes ?? 0}</td>
+                    <td className="px-4 py-2">{book.favorites ?? 0}</td>
+                    <td className="px-4 py-2">{book.coins ?? 0}</td>
+                    <td className="px-4 py-2">
+                      <Button onClick={() => router.push(`/add-books/${book.id}`)}>
+                        Edit
+                      </Button>
+                      <Button className="ml-2" onClick={() => {}}>Delete</Button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={5} className="px-4 py-2 text-center">
+                    No books found.
                   </td>
                 </tr>
-              ))}
+              )}
+
 
             </tbody>
           </table>

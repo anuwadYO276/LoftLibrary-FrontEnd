@@ -190,8 +190,27 @@ export async function getBookId(id) {
       throw new Error(error.message || "Network Error")
     }
   }
-}
+};
 
+export async function getIsFollowing(userId, bookId) {
+  try {
+    const res = await axios.get(`${BASE_URL}/api/books/following/${userId}/${bookId}`, {
+      headers: {
+        Authorization: getBasicAuthHeader(),
+      },
+    })
+
+    return res.data
+
+  } catch (error) {
+    if (error.response) {
+      throw new Error(error.response.data.message || "Failed to fetch following status")
+    } else {
+      throw new Error(error.message || "Network Error")
+    }
+  }
+}
+ 
 
 export async function updateFollow(userId, bookId) {
   try {
@@ -216,6 +235,69 @@ export async function updateFollow(userId, bookId) {
       throw new Error(error.response.data.message || "Failed to update follow status")
     } else {
       // ปัญหาเช่น network error
+      throw new Error(error.message || "Network Error")
+    }
+  }
+}
+
+export async function updateRating(userId, bookId, rating, comment = "") {
+  try {
+    const res = await axios.post(
+      `${BASE_URL}/api/books/rate`,
+      {
+        bookId: bookId,
+        userId: userId,
+        rating: rating,
+        comment: comment,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: getBasicAuthHeader(),
+        },
+      }
+    )
+    return res.data 
+
+  } catch (error) {
+    // ถ้า server ตอบกลับด้วย status code != 2xx
+    if (error.response) {
+      throw new Error(error.response.data.message || "Failed to update rating")
+    } else {
+      // ปัญหาเช่น network error
+      throw new Error(error.message || "Network Error")
+    }
+  }
+}
+
+
+
+export async function getBookmark({ category, page = 1, limit = 10, search = "", userId = null } = {}) {
+  try {
+    const res = await axios.get(`${BASE_URL}/api/user`, {
+      headers: {
+        Authorization: getBasicAuthHeader(),
+      },
+      params: {
+        ...(category && { category: Array.isArray(category) ? category.join(",") : category }),
+        page,
+        limit,
+        ...(search && { search }),
+        ...(userId && { userId }), // เพิ่ม userId ถ้ามี
+      },
+    })
+    const books = res.data.detail?.data || []
+    const pagination = res.data.detail?.pagination || {}
+
+    return {
+      data: books,
+      pagination,
+    }
+  } catch (error) {
+    console.error("Fetch books error:", error.response?.data || error.message)
+    if (error.response) {
+      throw new Error(error.response.data.message || "Failed to fetch books")
+    } else {
       throw new Error(error.message || "Network Error")
     }
   }

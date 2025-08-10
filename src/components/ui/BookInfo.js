@@ -2,7 +2,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Bookmark, Heart } from "lucide-react"
-import {updateFollow } from "@/lib/api/book"
+import {updateFollow, updateRating } from "@/lib/api/book"
 
 export default function BookInfo(
   { rating
@@ -22,6 +22,8 @@ export default function BookInfo(
     , followers
     , userId
 }) {
+
+
   const renderStars = (currentRating) => {
     return Array.from({ length: 5 }, (_, i) => {
       const starIndex = i + 1
@@ -29,7 +31,7 @@ export default function BookInfo(
         <span
           key={i}
           className={`text-xl cursor-pointer ${starIndex <= currentRating ? "text-mint-light" : "text-gray-600"}`}
-          onClick={() => setRating(starIndex)}
+          onClick={() => handleRating(starIndex)}
           role="button"
           tabIndex={0}
           aria-label={`Set rating to ${starIndex}`}
@@ -40,6 +42,17 @@ export default function BookInfo(
     })
   }
 
+  
+const handleRating = async (newRating) => {
+    setRating(newRating)
+    
+      const res = await updateRating(userId, bookId, newRating, "")
+      if (res.status_code === 200) {
+        console.log("Rating updated successfully")
+      } else {
+        console.error("Failed to update rating:", res.message)
+      }
+}
   const handleFollow = async () => {
     try {
       const res = await updateFollow(userId, bookId)
@@ -55,7 +68,7 @@ export default function BookInfo(
     }
   }
 
-
+  console.log("rating:", rating)
   return (
     <div>
       <div className="flex items-center gap-4 mb-2">
@@ -73,34 +86,22 @@ export default function BookInfo(
             {title}
         </h1>
 
-      {isAuthor ? (
-        <a
-          href={`/add-books/${bookId}`} // แก้ id เป็นตัวแปรจริงจาก props/state
-          className="cursor-pointer p-2 rounded-full hover:bg-gray-700 transition-colors flex items-center justify-center"
-          aria-label="Edit book"
-        >
-         <button className="w-6 h-6 text-teal-400 hover:text-mint-light transition-colors">
-            Edit
-         </button>
-        </a>
-      ) : (
-        
-        <span
-          onClick={() => setIsBookmarked(!isBookmarked)}
-          className="cursor-pointer p-2 rounded-full hover:bg-gray-700 transition-colors flex items-center justify-center"
-          role="button"
-          tabIndex={0}
-          aria-pressed={isBookmarked}
-          aria-label={isBookmarked ? "Unbookmark" : "Bookmark"}
-        >
+        {/* <span
+            onClick={() => setIsBookmarked(!isBookmarked)}
+            className="cursor-pointer p-2 rounded-full hover:bg-gray-700 transition-colors flex items-center justify-center"
+            role="button"
+            tabIndex={0}
+            aria-pressed={isBookmarked}
+            aria-label={isBookmarked ? "Unbookmark" : "Bookmark"}
+          >
           <Bookmark
             className={`w-6 h-6 transition-colors duration-200 ${
               isBookmarked ? "text-mint-light" : "text-gray-400"
             }`}
             fill={isBookmarked ? "currentColor" : "none"}
           />
-        </span>
-      )}
+        </span> */}
+
 
         </div>
 
