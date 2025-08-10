@@ -44,7 +44,7 @@ export default function MyWritingPage() {
       if (user?.id) {
         try {
           const res = await getBookMy(user.id)
-          setBooks(res.detail.books || [])
+          setBooks(res.detail || [])
         } catch (err) {
           console.error("Error fetching books:", err)
           setModalInfo({
@@ -104,49 +104,35 @@ export default function MyWritingPage() {
             Create New Book
           </a>
 
-          {books.length === 0 ? (
-            <p>No books found.</p>
-          ) : (
-            <table className="min-w-full mt-6">
+          <table className="min-w-full mt-6">
             <thead>
               <tr>
                 <th className="px-4 py-2 text-left">Title</th>
-                <th className="px-4 py-2 text-left">Author</th>
-                <th className="px-4 py-2 text-left">Actions</th>
                 <th className="px-4 py-2 text-left">sum episodes</th>
                 <th className="px-4 py-2 text-left">sum favorites</th>
                 <th className="px-4 py-2 text-left">sum coins</th>
+                <th className="px-4 py-2 text-left">Actions</th>
               </tr>
             </thead>
             <tbody>
               {books.map((book) => (
                 <tr key={book.id}>
                   <td className="px-4 py-2">{book.title}</td>
-                  <td className="px-4 py-2">{book.author}</td>
+                  <td className="px-4 py-2">{book.episodes ?? 0}</td>
+                  <td className="px-4 py-2">{book.favorites ?? 0}</td>
+                  <td className="px-4 py-2">{book.coins ?? 0}</td>
                   <td className="px-4 py-2">
-                    <Button
-                      onClick={() => {
-                        // Handle edit action
-                      }}
-                    >
+                    {/* ปุ่มแก้ไข ไปที่ add-books/{book.id} */}
+                    <Button onClick={() => router.push(`/add-books/${book.id}`)}>
                       Edit
                     </Button>
-                    <Button
-                      onClick={() => {
-                        // Handle delete action
-                      }}
-                    >
-                      Delete
-                    </Button>
+                    <Button className="ml-2" onClick={() => {}}>Delete</Button>
                   </td>
-                  <td className="px-4 py-2">{book.episodes}</td>
-                  <td className="px-4 py-2">{book.favorites}</td>
-                  <td className="px-4 py-2">{book.coins}</td>
                 </tr>
               ))}
+
             </tbody>
           </table>
-          )}
 
           {/* ถ้าต้องการเพิ่ม UI อื่น ๆ ก็ใส่ตรงนี้ */}
         </main>

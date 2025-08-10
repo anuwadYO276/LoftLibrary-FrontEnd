@@ -5,8 +5,6 @@ import { getBasicAuthHeader } from "@/lib/authHeader"
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"
 
-
-
 export async function getBooks({ category, page = 1, limit = 10, search = "" } = {}) {
   try {
     const res = await axios.get(`${BASE_URL}/api/books`, {
@@ -14,20 +12,21 @@ export async function getBooks({ category, page = 1, limit = 10, search = "" } =
         Authorization: getBasicAuthHeader(),
       },
       params: {
-        ...(category && { category }),
+        ...(category && { category: Array.isArray(category) ? category.join(",") : category }),
         page,
         limit,
         ...(search && { search }),
       },
     })
-    const books = res.data.data || []
-    const pagination = res.data.detail.pagination || {}
+    const books = res.data.detail?.data || []
+    const pagination = res.data.detail?.pagination || {}
+
     return {
       data: books,
       pagination,
     }
-    
   } catch (error) {
+    console.error("Fetch books error:", error.response?.data || error.message)
     if (error.response) {
       throw new Error(error.response.data.message || "Failed to fetch books")
     } else {
@@ -35,6 +34,7 @@ export async function getBooks({ category, page = 1, limit = 10, search = "" } =
     }
   }
 }
+
 
 export async function checkin(userId) {
   try {
@@ -193,6 +193,36 @@ export async function getBookId(id) {
 }
 
 
+export async function updateFollow(userId, bookId) {
+  try {
+    const res = await axios.post(
+      `${BASE_URL}/api/user/favorites`,
+      {
+        userId: userId,
+        bookId: bookId,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: getBasicAuthHeader(),
+        },
+      }
+    )
+    return res.data 
+
+  } catch (error) {
+    // ถ้า server ตอบกลับด้วย status code != 2xx
+    if (error.response) {
+      throw new Error(error.response.data.message || "Failed to update follow status")
+    } else {
+      // ปัญหาเช่น network error
+      throw new Error(error.message || "Network Error")
+    }
+  }
+}
+
+
+
 
 
 // 📘 Create a new book
@@ -256,34 +286,6 @@ export async function updateIsComplete(id, isComplete) {
     if (error.response) {
       throw new Error(error.response.data.message || "Failed to update book status")
     } else {
-      throw new Error(error.message || "Network Error")
-    }
-  }
-}
-
-export async function updateFollow(userId, bookId) {
-  try {
-    const res = await axios.post(
-      `${BASE_URL}/product/follow`,
-      {
-        user_id: userId,
-        book_id: bookId,
-      },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: getBasicAuthHeader(),
-        },
-      }
-    )
-    return res.data 
-
-  } catch (error) {
-    // ถ้า server ตอบกลับด้วย status code != 2xx
-    if (error.response) {
-      throw new Error(error.response.data.message || "Failed to update follow status")
-    } else {
-      // ปัญหาเช่น network error
       throw new Error(error.message || "Network Error")
     }
   }

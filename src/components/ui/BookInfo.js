@@ -43,7 +43,9 @@ export default function BookInfo(
   const handleFollow = async () => {
     try {
       const res = await updateFollow(userId, bookId)
-      if (res.statusCode === 200) {
+      console.log("Follow status updated:", res)
+      if (res.status_code == 200) {
+        console.log("Follow status updated successfully")
         setIsFollowing(!isFollowing)
       } else {
         console.error("Failed to update follow status:", res.message)
@@ -141,23 +143,24 @@ export default function BookInfo(
       </div>
 
       <div className="flex items-center gap-3">
-        <Heart className="w-5 h-5 text-mint-light" />
-         <div className="flex gap-2">
-        {category ? (
-          category.split(",").map((cat, index) => (
+      <Heart className="w-5 h-5 text-mint-light" />
+      <div className="flex gap-2">
+        {category && category.length > 0 ? (
+          category.map((cat) => (
             <Badge
-              key={index}
+              key={cat.id}
               variant="outline"
               className="border-gray-600 text-gray-300 hover:border-mint-light cursor-default"
             >
-              {cat.trim()}
+              {cat.name}
             </Badge>
           ))
         ) : (
-          <span className="text-gray-500 italic">No categories</span>
+          <span className="text-gray-500 italic">No category</span>
         )}
       </div>
-      </div>
+    </div>
+
 
      
 

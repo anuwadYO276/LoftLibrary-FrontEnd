@@ -41,7 +41,12 @@ export default function AddBooks({ isEdit = false, editId = null }) {
       try {
         const res = await getBookId(editId)
         let data = res.detail || {}
-        console.log("Fetched book data:", data)
+
+        if (data.user_id && data.user_id !== user.id) {
+          alert("You are not the owner of this book.")
+          router.push("/")
+          return
+        }
 
         if (data) {
           const url = process.env.NEXT_PUBLIC_API_URL || ""
