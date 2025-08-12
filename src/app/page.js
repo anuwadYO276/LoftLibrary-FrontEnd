@@ -54,13 +54,9 @@ export default function LibraryPage() {
   useEffect(() => {
     async function checkInUser() {
 
-      console.log("Checking in user:", userData)
-      console.log("Has checked in:", hasCheckedIn)
-
       if (!userData || hasCheckedIn) return
       try {
         const res = await checkin(userData.id)
-        console.log("Check-in response:", res)
         if (res.status_code === 200) {
           setHasCheckedIn(true)
           setModalInfo({

@@ -36,10 +36,7 @@ export default function BookDetailPage() {
     const fetchBook = async () => {
       try {
         const dataArr = await getBookId(id)
-        console.log("Fetched book data:", dataArr)
         const data = dataArr.detail || {}
-
-        // console.log("Fetched book data:", data)
         setRating(data.avg_rating || 0)
 
       

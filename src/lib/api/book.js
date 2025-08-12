@@ -150,6 +150,8 @@ export async function updateBook(data) {
   formData.append("userId", data.userId || "");
   formData.append("description", data.description || "");
   formData.append("category", data.categories || "");
+  formData.append("release_date", data.releaseDate || "");
+  formData.append("status", data.status || "draft");
   
   if (data.booksFile) {
     formData.append("books", data.booksFile);
@@ -377,17 +379,60 @@ export async function updateIsComplete(id, isComplete) {
 
 export async function getEpisodeId(bookId, episodeId) {
   try {
-    const res = await axios.get(`${BASE_URL}/episode/${bookId}/${episodeId}`, {
+    
+    const res = await axios.get(`${BASE_URL}/api/episodes/${bookId}/${episodeId}`, {
       headers: {
         Authorization: getBasicAuthHeader(),
       },
     })
-
     return res.data
 
   } catch (error) {
     if (error.response) {
       throw new Error(error.response.data.message || "Failed to fetch episode")
+    } else {
+      throw new Error(error.message || "Network Error")
+    }
+  }
+}
+
+
+export async function getHistoryPurchase(userId,bookId) {
+  try {
+    const res = await axios.post(`${BASE_URL}/api/user/episode-history`, {
+      userId: userId,
+      bookId: bookId,
+    }, {
+      headers: {
+        Authorization: getBasicAuthHeader(),
+      },
+    })
+    return res.data
+  } catch (error) {
+    if (error.response) {
+      throw new Error(error.response.data.message || "Failed to fetch purchase history")
+    } else {
+      throw new Error(error.message || "Network Error")
+    }
+  }
+}
+
+export async function BayPurchase(userId, bookId, episodeId, amount) {
+  try {
+    const res = await axios.post(`${BASE_URL}/api/purchases`, {
+      userId: userId,
+      bookId: bookId,
+      episodeId: episodeId,
+      amount: amount,
+    }, {
+      headers: {
+        Authorization: getBasicAuthHeader(),
+      },
+    })
+    return res.data
+  } catch (error) {
+    if (error.response) {
+      throw new Error(error.response.data.message || "Failed to purchase episode")
     } else {
       throw new Error(error.message || "Network Error")
     }

@@ -125,14 +125,17 @@ export default function MyWritingPage() {
                 books.map((book) => (
                   <tr key={book.id}>
                     <td className="px-4 py-2">{book.title}</td>
-                    <td className="px-4 py-2">{book.episodes ?? 0}</td>
-                    <td className="px-4 py-2">{book.favorites ?? 0}</td>
-                    <td className="px-4 py-2">{book.coins ?? 0}</td>
+                    <td className="px-4 py-2">{book.episodes_count ?? 0}</td>
+                    <td className="px-4 py-2">{book.favorites_count ?? 0}</td>
+                    <td className="px-4 py-2">{book.purchases_count ?? 0}</td>
                     <td className="px-4 py-2">
-                      <Button onClick={() => router.push(`/add-books/${book.id}`)}>
+                      <Button className="ml-2" onClick={() => router.push(`/book/${book.id}`)}>
+                        Episode
+                      </Button>
+                      <Button className="ml-2" onClick={() => router.push(`/add-books/${book.id}`)}>
                         Edit
                       </Button>
-                      <Button className="ml-2" onClick={() => {}}>Delete</Button>
+                      {/* <Button className="ml-2" onClick={() => {}}>Delete</Button> */}
                     </td>
                   </tr>
                 ))

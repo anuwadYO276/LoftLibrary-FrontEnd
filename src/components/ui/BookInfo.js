@@ -141,9 +141,9 @@ const handleRating = async (newRating) => {
         </Button>
         ) : (
           <>
-          <span className="text-xl text-gray-300">
+          {/* <span className="text-xl text-gray-300">
             Followers: {followers}
-          </span>
+          </span> */}
           </>
         )}
       </div>

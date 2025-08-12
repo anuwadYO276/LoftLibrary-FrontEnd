@@ -50,6 +50,7 @@ export async function CreateEpisode(bookId, data) {
   formData.append("price", data.price || 0)
   formData.append("release_date", data.release_date)
   formData.append("status", data.status || "draft")
+  formData.append("priority", data.priority || "")
 
   if (data.cover) formData.append("cover", data.cover)
 
@@ -78,6 +79,7 @@ export async function UpdateEpisode(bookId, episodeId, data) {
   formData.append("price", data.price || 0)
   formData.append("release_date", data.release_date)
   formData.append("status", data.status || "draft")
+  formData.append("priority", data.priority || "")
 
   if (data.cover) formData.append("cover", data.cover)
 
