@@ -151,7 +151,8 @@ const handleSeek = (value) => {
               {episode.content || "No description available."}
             </p>
 
-            <audio ref={audioRef} src={`${url}/uploads/audio/${episode.audio_id}`} preload="metadata" className="hidden" />
+            {/* <audio ref={audioRef} src={`${url}/uploads/audio/${episode.audio_id}`} preload="metadata" className="hidden" /> */}
+            <audio ref={audioRef} src={`${episode.audio_url}`} preload="metadata" className="hidden" />
 
             {/* แสดงเวลาปัจจุบัน และ Slider */}
             <div className="w-full mb-4">
