@@ -36,7 +36,9 @@ export default function UserProfileMenu() {
     async function fetchProfileAndCoins() {
       try {
         const profileRes = await getProfile(userId)
+        console.log("Profile response:", profileRes)
         setProfile(profileRes.detail)
+        // pen_name
 
         const coinsRes = await getCoins(userId)
         setCoins(coinsRes.detail.totalCoins || 0)
@@ -128,7 +130,7 @@ export default function UserProfileMenu() {
             </TextLink>
 
             {/* แสดงเมนู My Writing ถ้าไม่ใช่ Reader */}
-            {profile.role !== "reader" && (
+            {profile.pen_name && (
               <TextLink
                 href="/my-writing"
                 className="text-left text-white hover:text-mint-light font-medium"

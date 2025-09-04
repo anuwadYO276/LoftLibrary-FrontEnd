@@ -31,7 +31,7 @@ export default function Header({ onSearch }) {
     <div className="">
     <header className="bg-custom-bg border-b border-white p-4 ">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4 ">
+        <div className="flex items-center gap-4">
           <TextLink href="/" className="text-mint-light hover:text-mint-dark transition-colors font-bold text-lg">
             <Home className="w-8 h-8" />
           </TextLink>
