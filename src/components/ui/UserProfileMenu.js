@@ -36,7 +36,6 @@ export default function UserProfileMenu() {
     async function fetchProfileAndCoins() {
       try {
         const profileRes = await getProfile(userId)
-        console.log("Profile response:", profileRes)
         setProfile(profileRes.detail)
         // pen_name
 

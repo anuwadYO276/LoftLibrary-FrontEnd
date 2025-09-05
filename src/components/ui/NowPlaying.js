@@ -28,7 +28,8 @@ export default function NowPlaying() {
     async function fetchAudio() {
       try {
 
-        const res = await getAudio(user.id) // ใช้ id 1 เป็นตัวอย่าง
+        if(!user) return
+        const res = await getAudio(user.id)
         if(res.status_code === 200) {
           setAudioSrc(res.detail[0].audio_url)
           if(res.detail[0].cover){

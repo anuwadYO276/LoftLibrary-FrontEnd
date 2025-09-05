@@ -542,3 +542,41 @@ export async function getAudio(userId) {
     }
   }
 }
+export async function getNotification(userId) {
+  try {
+    const res = await axios.post(`${BASE_URL}/api/user/get_notification`, {
+      userId: userId,
+    }, {
+      headers: {
+        Authorization: getBasicAuthHeader(),
+      },
+    })
+    return res.data
+  } catch (error) {
+    if (error.response) {
+      throw new Error(error.response.data.message || "Failed to fetch notifications")
+    } else {
+      throw new Error(error.message || "Network Error")
+    }
+  }
+}
+
+export async function activeNotification(userId, episodeId) {
+  try {
+    const res = await axios.post(`${BASE_URL}/api/user/active_notification`, {
+      userId: userId,
+      episodeId: episodeId,
+    }, {
+      headers: {
+        Authorization: getBasicAuthHeader(),
+      },
+    })
+    return res.data
+  } catch (error) {
+    if (error.response) {
+      throw new Error(error.response.data.message || "Failed to activate notification")
+    } else {
+      throw new Error(error.message || "Network Error")
+    }
+  }
+}

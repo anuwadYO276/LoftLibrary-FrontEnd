@@ -38,7 +38,6 @@ export default function EpisodeItem({ episode, onUnlock, isAuthor, id }) {
     async function fetchData() {
       try {
         const historyRes = await getHistoryPurchase(userId, bookId)
-        console.log("EpisodeItem Purchase history:", historyRes, userId, bookId, episodeId)
         if (historyRes?.status_code === 200 && Array.isArray(historyRes.detail)) {
 
           let data_list_episode_id = historyRes.detail.map(item => item.episode_id) || []
