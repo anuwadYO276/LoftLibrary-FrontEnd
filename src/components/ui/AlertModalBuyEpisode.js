@@ -64,6 +64,7 @@ export default function AlertModalBuyEpisode({
               {cancelText}
             </Button>
           )}
+          {!insufficientCoins && (
           <Button
             onClick={onConfirm}
             disabled={insufficientCoins}
@@ -71,6 +72,7 @@ export default function AlertModalBuyEpisode({
           >
             {insufficientCoins ? "Cannot Confirm" : confirmText}
           </Button>
+          )}
         </div>
       </div>
     </div>
