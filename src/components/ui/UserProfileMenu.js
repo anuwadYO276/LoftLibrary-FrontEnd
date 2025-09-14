@@ -7,40 +7,26 @@ import { useRouter } from "next/navigation"
 import { getCoins, getProfile } from "@/lib/api/book"
 
 const url = process.env.NEXT_PUBLIC_API_URL
+
 export default function UserProfileMenu() {
   const [open, setOpen] = useState(false)
-  const [userId, setUserId] = useState(null)
   const [profile, setProfile] = useState(null)
   const [coins, setCoins] = useState(0)
   const menuRef = useRef(null)
-  const { logout } = useAuth()
-  const router = useRouter()
 
-  // อ่าน userId จาก sessionStorage
-  useEffect(() => {
-    const storedUser = sessionStorage.getItem("user")
-    console.log("Stored user:", storedUser)
-    if (storedUser) {
-      try {
-        const parsed = JSON.parse(storedUser)
-        setUserId(parsed.id)
-      } catch (err) {
-        console.error("Error parsing user from sessionStorage:", err)
-      }
-    }
-  }, [])
+  const { user, logout } = useAuth()   // ✅ ใช้ context แทน
+  const router = useRouter()
 
   // ดึงข้อมูลโปรไฟล์จาก API
   useEffect(() => {
-    if (!userId) return
+    if (!user?.id) return
 
     async function fetchProfileAndCoins() {
       try {
-        const profileRes = await getProfile(userId)
+        const profileRes = await getProfile(user.id)
         setProfile(profileRes.detail)
-        // pen_name
 
-        const coinsRes = await getCoins(userId)
+        const coinsRes = await getCoins(user.id)
         setCoins(coinsRes?.detail?.totalCoins || 0)
       } catch (error) {
         console.error("Error fetching profile or coins:", error)
@@ -48,7 +34,7 @@ export default function UserProfileMenu() {
     }
 
     fetchProfileAndCoins()
-  }, [userId])
+  }, [user])
 
   // ปิดเมนูเมื่อคลิกข้างนอก
   useEffect(() => {
@@ -66,18 +52,10 @@ export default function UserProfileMenu() {
   const handleLogout = (e) => {
     e.preventDefault()
     logout()
-    sessionStorage.removeItem("user")
-    sessionStorage.removeItem("token")
     router.push("/login")
   }
 
-  if (!profile){
-    // logout()
-    // sessionStorage.removeItem("user")
-    // sessionStorage.removeItem("token")
-    // router.push("/login")
-    return null
-  }
+  if (!user || !profile) return null   // ✅ ป้องกัน render เปล่า
 
   return (
     <div className="relative" ref={menuRef}>
@@ -115,21 +93,16 @@ export default function UserProfileMenu() {
                   alt="Profile"
                   className="w-full h-full object-cover rounded-full"
                 />
-
               </div>
               <span className="text-teal-300 font-semibold text-lg truncate">
                 {profile.username}
               </span>
             </div>
 
-            <TextLink
-              href="/my-coins"
-              className="text-left text-white hover:text-mint-light font-medium"
-            >
+            <TextLink href="/my-coins" className="text-left text-white hover:text-mint-light font-medium">
               Coin: <span className="text-teal-300">{coins} C</span>
             </TextLink>
 
-            {/* แสดงเมนู My Writing ถ้าไม่ใช่ Reader */}
             {profile.pen_name && (
               <TextLink
                 href="/my-writing"
@@ -139,7 +112,6 @@ export default function UserProfileMenu() {
               </TextLink>
             )}
 
-            {/* ลิงก์ Profile */}
             <TextLink
               href="/my-profile"
               className="text-left text-white hover:text-mint-light font-medium"
@@ -147,7 +119,6 @@ export default function UserProfileMenu() {
               My Profile
             </TextLink>
 
-            {/* Logout */}
             <button
               onClick={handleLogout}
               className="text-center text-red-600 hover:text-red-800 font-medium mt-2 cursor-pointer"
