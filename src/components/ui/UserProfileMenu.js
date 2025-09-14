@@ -127,7 +127,7 @@ export default function UserProfileMenu() {
             </button>
           </div>
         </div>
-      )}
+      )} 
     </div>
   )
 }
