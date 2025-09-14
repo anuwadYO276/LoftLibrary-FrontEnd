@@ -27,6 +27,7 @@ export default function UserProfileMenu() {
     async function fetchProfileAndCoins() {
       try {
         const profileRes = await getProfile(user.id)
+        console.log("Profile response:", profileRes)
         setProfile(profileRes.detail)
 
         const coinsRes = await getCoins(user.id)
