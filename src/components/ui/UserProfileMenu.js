@@ -21,6 +21,8 @@ export default function UserProfileMenu() {
   
   console.log("✅ Saved user:", sessionStorage.getItem("user")); 
   console.log("user:", user); 
+  console.log("profile:", profile); 
+  console.log("url avatar:", `${process.env.NEXT_PUBLIC_API_URL || url}/uploads/avatar/${profile?.avatar}`);
 
   // ดึงข้อมูลโปรไฟล์จาก API
   useEffect(() => {
