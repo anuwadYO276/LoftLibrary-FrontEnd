@@ -72,7 +72,7 @@ export default function UserProfileMenu() {
         onClick={() => setOpen(!open)}
       >
         <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-200">
-          <img
+          {/* <img
             src={
               profile?.avatar
                 ? `${process.env.NEXT_PUBLIC_API_URL || url}/uploads/avatar/${profile.avatar}`
@@ -80,6 +80,19 @@ export default function UserProfileMenu() {
             }
             alt="Profile"
             className="w-full h-full object-cover rounded-full"
+          /> */}
+          <img
+            src={
+              profile?.avatar
+                ? `${url}/uploads/avatar/${profile.avatar}`
+                : "https://bootstrapdemos.adminmart.com/modernize/dist/assets/images/profile/user-1.jpg"
+            }
+            alt="Profile"
+            className="w-full h-full object-cover rounded-full"
+            onError={(e) => {
+              // fallback ถ้าโหลดรูปไม่สำเร็จ
+              e.currentTarget.src = "https://bootstrapdemos.adminmart.com/modernize/dist/assets/images/profile/user-1.jpg";
+            }}
           />
         </div>
       </div>
