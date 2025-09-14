@@ -62,7 +62,7 @@ export default function UserProfileMenu() {
     router.push("/login")
   }
 
-  if (!user || !profile) return null   // ✅ ป้องกัน render เปล่า
+  // if (!user || !profile) return null   // ✅ ป้องกัน render เปล่า
 
   return (
     <>
