@@ -19,6 +19,7 @@ export default function UserProfileMenu() {
   // อ่าน userId จาก sessionStorage
   useEffect(() => {
     const storedUser = sessionStorage.getItem("user")
+    console.log("Stored user:", storedUser)
     if (storedUser) {
       try {
         const parsed = JSON.parse(storedUser)
