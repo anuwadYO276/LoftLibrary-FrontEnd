@@ -25,59 +25,67 @@ export default function LoginPage() {
   const { setUser } = useAuth()
   const router = useRouter()
 
-  
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault()
 
     try {
-      setLoading(true);
-      setError(null);
+      setLoading(true)
+      setError(null)
 
-      const result = await login({ email, password });
-      console.log("Login result:", result);
+      const result = await login({ email, password })
+      console.log("Login result:", result)
 
-      if (result.status_code === 200 || result.status_code === 201) {
+      if (result?.status_code === 200 || result?.status_code === 201) {
         setModalInfo({
           type: "success",
           title: "Login Successful",
           message: result.status_message || "You have successfully logged in.",
-        });
-        setShowModal(true);
+        })
+        setShowModal(true)
 
-        // ✅ เก็บข้อมูล user และ token อย่างถูกต้อง
-        if (result.detail?.payload) {
-          const userData = result.detail.payload;
-          const token = result.detail.token;
+        // ✅ เก็บข้อมูล user และ token อย่างปลอดภัย
+        if (result.detail?.payload && result.detail?.token) {
+          const userData = result.detail.payload
+          const token = result.detail.token
 
-          setUser(userData);
-          sessionStorage.setItem("user", JSON.stringify(userData));
-          sessionStorage.setItem("token", token);
+          setUser(userData)
 
-          setEmail("");
-          setPassword("");
+          // ✅ ป้องกัน error ตอน build โดยเช็ค window
+          if (typeof window !== "undefined") {
+            sessionStorage.setItem("user", JSON.stringify(userData))
+            sessionStorage.setItem("token", token)
+          }
+
+          setEmail("")
+          setPassword("")
         }
       } else {
         setModalInfo({
           type: "error",
           title: "Login Failed",
-          message: result.detail || "An error occurred during login.",
-        });
-        setShowModal(true);
+          message:
+            typeof result?.detail === "string"
+              ? result.detail
+              : "An error occurred during login.",
+        })
+        setShowModal(true)
       }
     } catch (err) {
-      setError(err.message || "Login failed");
+      console.error("Login error:", err)
+      setError(err.message || "Login failed")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
-
+  }
 
   const handleModalConfirm = () => {
     setShowModal(false)
     if (modalInfo.type === "success") {
-      console.log(sessionStorage.getItem("user"))
-      console.log(sessionStorage.getItem("token"))
-      router.replace("/") // หรือเปลี่ยนเป็น path หลักของระบบ เช่น "/dashboard"
+      if (typeof window !== "undefined") {
+        console.log("User in sessionStorage:", sessionStorage.getItem("user"))
+        console.log("Token in sessionStorage:", sessionStorage.getItem("token"))
+      }
+      router.replace("/") // ✅ ไปหน้าแรก หรือ "/dashboard"
     }
   }
 
@@ -123,7 +131,9 @@ export default function LoginPage() {
             />
 
             {error && (
-              <div className="text-red-500 text-center font-semibold">{error}</div>
+              <div className="text-red-500 text-center font-semibold">
+                {error}
+              </div>
             )}
 
             <Button className="w-full h-12 mt-4" disabled={loading}>
@@ -136,9 +146,12 @@ export default function LoginPage() {
       {/* Right Side - Welcome Message */}
       <div className="flex-1 bg-custom-bg flex items-center justify-center p-8">
         <div className="text-center max-w-md">
-          <h2 className="text-4xl font-bold text-mint-light mb-6">Welcome back!</h2>
+          <h2 className="text-4xl font-bold text-mint-light mb-6">
+            Welcome back!
+          </h2>
           <p className="text-gray-light text-lg leading-relaxed mb-8">
-            We&apos;re happy to see you again. Log in to access your dashboard and continue where you left off.
+            We&apos;re happy to see you again. Log in to access your dashboard
+            and continue where you left off.
           </p>
           <div className="text-gray-light">
             <span>No account yet? </span>
