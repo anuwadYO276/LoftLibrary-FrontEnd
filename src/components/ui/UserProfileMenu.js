@@ -82,17 +82,9 @@ export default function UserProfileMenu() {
             className="w-full h-full object-cover rounded-full"
           /> */}
           <img
-            src={
-              profile?.avatar
-                ? `${url}/uploads/avatar/${profile.avatar}`
-                : "https://bootstrapdemos.adminmart.com/modernize/dist/assets/images/profile/user-1.jpg"
-            }
+            src="https://bootstrapdemos.adminmart.com/modernize/dist/assets/images/profile/user-1.jpg"
             alt="Profile"
             className="w-full h-full object-cover rounded-full"
-            onError={(e) => {
-              // fallback ถ้าโหลดรูปไม่สำเร็จ
-              e.currentTarget.src = "https://bootstrapdemos.adminmart.com/modernize/dist/assets/images/profile/user-1.jpg";
-            }}
           />
         </div>
       </div>
