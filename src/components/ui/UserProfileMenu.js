@@ -10,7 +10,7 @@ const url = process.env.NEXT_PUBLIC_API_URL
 
 export default function UserProfileMenu() {
   
-  console.log("✅ Saved user:", sessionStorage.getItem("user"));
+  console.log("✅ Saved user:", sessionStorage.getItem("user")); 
   const [open, setOpen] = useState(false)
   const [profile, setProfile] = useState(null)
   const [coins, setCoins] = useState(0)
