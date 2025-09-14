@@ -88,7 +88,7 @@ export default function BookDetailPage() {
         setTotalPrice(totalPrice)
         setListArrayEpisodeId(listArrayEpisodeId)
         const coinsRes = await getCoins(user.id)
-        setCoins(coinsRes.detail?.totalCoins || 0)
+        setCoins(coinsRes?.detail?.totalCoins || 0)
       } catch (error) {
         console.error("Error fetching purchase/coin data:", error)
       }

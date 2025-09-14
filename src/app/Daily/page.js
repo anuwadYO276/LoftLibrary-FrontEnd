@@ -47,8 +47,8 @@ export default function DailyCalendarPage() {
       if (user?.id) {
         try {
           const res = await getCoins(user.id)
-          setCoins(res.detail.totalCoins || 0)
-          setTransactions(res.detail.transactions || [])
+          setCoins(res?.detail?.totalCoins || 0)
+          setTransactions(res?.detail?.transactions || [])
         } catch (err) {
           console.error("Error fetching coins:", err)
           setModalInfo({

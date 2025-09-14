@@ -49,7 +49,7 @@ export default function EpisodeItem({ episode, onUnlock, isAuthor, id }) {
         }
 
         const coinsRes = await getCoins(userId)
-        setCoins(coinsRes.detail?.totalCoins || 0)
+        setCoins(coinsRes?.detail?.totalCoins || 0)
       } catch (error) {
         console.error("Error fetching data:", error)
       }

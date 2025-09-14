@@ -49,8 +49,8 @@ export default function MyCoinsPage() {
       if (user?.id) {
         try {
           const res = await getCoins(user.id)
-          setCoins(res.detail.totalCoins || 0)
-          setTransactions(res.detail.transactions || [])
+          setCoins(res?.detail?.totalCoins || 0)
+          setTransactions(res?.detail?.transactions || [])
         } catch (err) {
           console.error("Error fetching coins:", err)
           setModalInfo({
@@ -80,7 +80,7 @@ export default function MyCoinsPage() {
       if (res?.status_code === 200) {
         // อัปเดตเหรียญใหม่
         const updated = await getCoins(user.id)
-        setCoins(updated.detail.totalCoins || 0)
+        setCoins(updated?.detail?.totalCoins || 0)
 
         setModalInfo({
           type: "success",

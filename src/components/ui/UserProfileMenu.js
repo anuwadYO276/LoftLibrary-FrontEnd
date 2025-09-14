@@ -40,7 +40,7 @@ export default function UserProfileMenu() {
         // pen_name
 
         const coinsRes = await getCoins(userId)
-        setCoins(coinsRes.detail.totalCoins || 0)
+        setCoins(coinsRes?.detail?.totalCoins || 0)
       } catch (error) {
         console.error("Error fetching profile or coins:", error)
       }
