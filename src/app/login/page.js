@@ -75,6 +75,8 @@ export default function LoginPage() {
   const handleModalConfirm = () => {
     setShowModal(false)
     if (modalInfo.type === "success") {
+      console.log(sessionStorage.getItem("user"))
+      console.log(sessionStorage.getItem("token"))
       router.replace("/") // หรือเปลี่ยนเป็น path หลักของระบบ เช่น "/dashboard"
     }
   }
