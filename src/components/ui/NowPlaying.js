@@ -30,7 +30,7 @@ export default function NowPlaying() {
 
         if(!user) return
         const res = await getAudio(user.id)
-        if(res.status_code === 200) {
+        if(res.status_code == 200) {
           // setAudioSrc(res.detail[0].audio_url)
           setAudioSrc(res.detail[0]?.audio_url || "/audio/sample.mp3")
           if(res.detail[0]?.cover){
@@ -38,7 +38,7 @@ export default function NowPlaying() {
             setImagesSrc(seturl)
           }
         } else {
-          console.error("Failed to fetch audio, status code:", res.status_code)
+          // console.error("Failed to fetch audio, status code:", res.status_code)
         }
       } catch (err) {
         console.error("Error fetching audio:", err)
