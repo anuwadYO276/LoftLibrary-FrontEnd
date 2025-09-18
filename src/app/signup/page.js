@@ -52,8 +52,10 @@ export default function SignupPage() {
         setModalInfo({
           type: "success",
           title: "Signup Successful",
-          message: result.detail || "You have successfully signed up.",
-        })
+          message: typeof result.detail === "string"
+            ? result.detail
+            : JSON.stringify(result.detail),
+        });
         setShowModal(true)
         return
       } else {
@@ -62,6 +64,7 @@ export default function SignupPage() {
           title: "Signup Failed",
           message: result.detail || "An error occurred during signup.",
         })
+
         setShowModal(true)
       }
     } catch (err) {
