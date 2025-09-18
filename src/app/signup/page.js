@@ -52,9 +52,7 @@ export default function SignupPage() {
         setModalInfo({
           type: "success",
           title: "Signup Successful",
-          message: typeof result.detail === "string"
-            ? result.detail
-            : JSON.stringify(result.detail),
+          message: "You have successfully signed up.",
         });
         setShowModal(true)
         return
